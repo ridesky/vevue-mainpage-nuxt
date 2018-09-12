@@ -40,7 +40,8 @@
                 <div @click='toPlayVrview' ref='vrPlaybutton' class='playbutton iconfont icon-tri_right'></div>
               </div>
             </div>
-            <video v-if="!showVRPlayer" id='my-video' class="video video-js vjs-default-skin vjs-big-play-centered" crossorigin="anonymous" webkit-playsinline playsinline :poster="apiUrl.videoURL + videoUrl +'.jpg'">
+            <video v-if="!showVRPlayer" id='my-video' class="video video-js vjs-default-skin vjs-big-play-centered" crossorigin="anonymous" webkit-playsinline playsinline>
+              <!-- :poster="apiUrl.videoURL + videoUrl +'.jpg'" -->
               <track kind='captions' v-for='item in subtitle' :src='item.vtt' :srclang='item.language' :label='item.label' :key='item.vtt' />
               <!-- <track kind='captions' src='https://dotsub.com/media/5d5f008c-b5d5-466f-bb83-2b3cfa997992/c/chi_hans/vtt' srclang='zh' label='中文' default />
             <track kind='captions' src='https://dotsub.com/media/5d5f008c-b5d5-466f-bb83-2b3cfa997992/c/eng/vtt' srclang='en' label='English'/>
@@ -721,6 +722,7 @@ export default {
               // withCredentials: true
             }
           ],
+          poster:apiUrl.videoURL + that.video.videoid +'.jpg',
           controls: true,
           autoplay: true,
           textTrackSettings: false
@@ -1105,7 +1107,7 @@ export default {
   }
 
   .left-meta {
-    padding: 5px 0px!important;
+    padding: 5px 0px !important;
     width: 640px;
     display: flex;
     justify-content: space-between;

@@ -277,14 +277,14 @@ export default {
     },
     getHotkey() {
       axios
-        .post(apiUrl.vevueAPI + 'listoffocus', {
+        .post(apiUrl.vevueAPI + 'hotkeylist', {
           userid: docCookies.getItem('userid') || '-',
           towho: docCookies.getItem('userid') || '-',
           authcode: docCookies.getItem('userid')
             ? totp.getCode(docCookies.getItem('safekey'))
             : '',
           cid: docCookies.getItem('cid'),
-          type: 'listoffocus',
+          type: 'hotkeylist',
           offset: 0,
           timestamp: Math.floor(new Date().getTime() / 1000)
         })
