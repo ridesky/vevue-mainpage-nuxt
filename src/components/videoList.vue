@@ -7,21 +7,21 @@
           <div class="videoItem">
             <div class="videoCoverBox" :class="{orange:0<video.price&&video.price<=70,purple:video.price>70}">
               <div class="videoAvatarBox">
-                <router-link :to=" '/user/' + video.yuan.bywho" tanrget='_blank'>
+                <router-link :to=" '/user/' + video.yuan.bywho">
                   <img :src="video.avatar" alt="avatar" class="videoAvatar" :onerror='defaultAvatarLogo'>
                 </router-link>
               </div>
               <div class="maoboli">
-                <router-link :to=" '/video/' + video.videoid">
+                <router-link :to="video.shorturl?'/video/'+video.shorturl.split('video/')[1]: '/video/' + video.videoid">
                   <img :src="video.coverURL" alt="" class="maskImage" :onerror='defaultCoverLogo'>
                 </router-link>
               </div>
               <div class="video_time" v-if="video.video_time">{{jsFormat.sec_to_time(video.video_time)}}</div>
-              <router-link :to=" '/video/' + video.videoid" :title="video.yuan.note || video.yuan.title">
+              <router-link :to="video.shorturl?'/video/'+video.shorturl.split('video/')[1]: '/video/' + video.videoid" :title="video.yuan.note || video.yuan.title">
                 <img :src="video.coverURL" alt="" class="videoPoster posterImage" :onerror='defaultCoverLogo'>
                 <!-- <img src="../../pages/home/assets/images/vevue_preimage.png" alt=""> -->
               </router-link>
-              <router-link :to=" '/video/' + video.videoid" class="videoList title note" v-if="video.yuan.title" :title="video.yuan.note">{{video.yuan.title}}</router-link>
+              <router-link :to="video.shorturl?'/video/'+video.shorturl.split('video/')[1]: '/video/' + video.videoid" class="videoList title note" v-if="video.yuan.title" :title="video.yuan.note">{{video.yuan.title}}</router-link>
               <!-- <router-link :to=" '/player/' + video.videoid" class="title videolist" v-else :title="video.yuan.title">{{video.yuan.title}}</router-link> -->
             </div>
             <div class="likesmen" v-if="video.tipslikes.length>0">
@@ -46,7 +46,7 @@
               </div>
               <div class="video-meta-menu iconfont icon-menu_col" :class="{'stay':showMetaMenuIndex === index}" v-on:click.self="toShowMetaMenuIndex(index,$event)">
                 <ul class="meta-sel">
-                  <li class="sel" @click="clipAddress('.clipBtn'+index)" :class="'clipBtn'+index" :aria-label='location.origin+"/video/"+video.videoid'>
+                  <li class="sel" @click="clipAddress('.clipBtn'+index)" :class="'clipBtn'+index" :aria-label='video.shorturl?video.shorturl:location.origin+"/video/"+video.videoid'>
                     Copy Link
                   </li>
                   <li class="sel" v-if="showRemoveHistory" @click="toRemoveHistory(video.videoid,index,0)">
@@ -138,7 +138,7 @@ export default {
     return {
       apiUrl,
       jsFormat,
-      location: process.client?window.location:'',
+      location: process.client ? window.location : '',
       hideLoading: false,
       scrollLock: true, // 滚动监听是否加锁
       showSetInfo: false, // 显示设置头像界面
@@ -503,7 +503,7 @@ body {
 
   .metaViewAndData {
     .view {
-      margin-right:3px;
+      margin-right: 3px;
     }
 
     display: flex;

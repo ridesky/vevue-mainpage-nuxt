@@ -322,13 +322,13 @@ export default {
     result = result.data;
     if (result.errcode === 0) {
       return {
-        videoSeoID: context.params.videoid,
         videoSeoTitle: result.title,
-        videoSeoNote: result.note
+        videoSeoNote: result.note,
+        videoLink: result.link
       };
     } else {
       return {
-        videoSeoID: context.params.videoid,
+        videoLink: context.params.videoid,
         videoSeoTitle: 'Vevue',
         videoSeoNote: 'Vevue'
       };
@@ -358,12 +358,12 @@ export default {
         },
         {
           property: 'og:site_name',
-          content: 'Vevue Og site name'
+          content: 'Vevue'
         },
         {
           property: 'og:image',
           content:
-            this.apiUrl.videoURL + this.videoSeoID.split('::main')[0] + '.jpg'
+            this.apiUrl.videoURL + this.videoLink.split('::main')[0] + '.jpg'
         },
         {
           property: 'og:width',
@@ -715,6 +715,7 @@ export default {
               // apiUrl.videoURL +
               // (that.videoUrl_real || that.videoUrl) +
               // '.mp4',
+              poster: apiUrl.videoURL + that.video.videoid.split('::main')[0] + '.jpg',
               type:
                 that.playlist[that.videoDPISet].url.indexOf('m3u8') > 0
                   ? 'application/x-mpegURL'
@@ -724,7 +725,7 @@ export default {
           ],
           poster:apiUrl.videoURL + that.video.videoid +'.jpg',
           controls: true,
-          autoplay: true,
+          autoplay: false,
           textTrackSettings: false
         },
         function() {
