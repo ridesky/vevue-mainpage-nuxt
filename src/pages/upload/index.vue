@@ -1,76 +1,76 @@
 <template>
-    <div>
-        <div class="topHeader">
-            <div class="topHeader-inner">
-                <a href="/">
-                    <img src="../../assets/images/logo-01.png" alt="vevue" class="header-logo"></a>
-            </div>
-        </div>
-        <el-progress class="uploadProgress" :class="{width100Per:uploadPercent}" :text-inside="true" :show-text='false' :stroke-width="8" :percentage="uploadPercent" status='success'></el-progress>
+  <div>
+    <div class="topHeader">
+      <div class="topHeader-inner">
+        <a href="/">
+          <img src="../../assets/images/logo-01.png" alt="vevue" class="header-logo"></a>
+      </div>
+    </div>
+    <el-progress class="uploadProgress" :class="{width100Per:uploadPercent}" :text-inside="true" :show-text='false' :stroke-width="8" :percentage="uploadPercent" status='success'></el-progress>
 
-        <div class="uploadBox">
-            <!-- <input type="file" @change='getPicInfo' accept=".png,.jpg"> -->
-            <!-- <img id="element_id" src="../../home/assets/images/vevue_logo_50x50.png"> -->
-            <el-upload v-show="!fileStatus.videoUrl" :show-file-list='false' ref="uploadVideo" class="upload-demo" drag action="" accept="video/mp4" :limit='1' :auto-upload='false' :multiple='false' :on-change='successFile'>
-                <i class="el-icon-upload"></i>
-                <div class="el-upload__text">Drag the file here, or
-                    <em>click to upload</em>
-                </div>
+    <div class="uploadBox">
+      <!-- <input type="file" @change='getPicInfo' accept=".png,.jpg"> -->
+      <!-- <img id="element_id" src="../../home/assets/images/vevue_logo_50x50.png"> -->
+      <el-upload v-show="!fileStatus.videoUrl" :show-file-list='false' ref="uploadVideo" class="upload-demo" drag action="" accept="video/mp4" :limit='1' :auto-upload='false' :multiple='false' :on-change='successFile'>
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">Drag the file here, or
+          <em>click to upload</em>
+        </div>
+      </el-upload>
+      <div class="videoBox" v-show="fileStatus.videoUrl">
+        <div class="buttonBox">
+          <div class="reUploadVideo">
+            <el-upload :on-change='successFile' ref="reUploadVideo" :show-file-list='false' :auto-upload='false' :limit="1" action="">
+              <el-button size="medium" type="primary">Reselect Video</el-button>
             </el-upload>
-            <div class="videoBox" v-show="fileStatus.videoUrl">
-                <div class="buttonBox">
-                    <div class="reUploadVideo">
-                        <el-upload :on-change='successFile' ref="reUploadVideo" :show-file-list='false' :auto-upload='false' :limit="1" action="">
-                            <el-button size="medium" type="primary">Reselect Video</el-button>
-                        </el-upload>
-                    </div>
-                    <el-button type="danger" class="screenShootVideoPic" @click="screenShootVideoPic({popMessage:true})" href="javascript:void(0)">Take Screenshot as Cover</el-button>
-                </div>
-                <video :src="fileStatus.videoUrl" controls ref="videoEle" id="videoEle" class="video" @loadeddata="screenShootVideoPic" autoplay>
-                </video>
+          </div>
+          <el-button type="danger" class="screenShootVideoPic" @click="screenShootVideoPic({popMessage:true})" href="javascript:void(0)">Take Screenshot as Cover</el-button>
+        </div>
+        <video :src="fileStatus.videoUrl" controls ref="videoEle" id="videoEle" class="video" @loadeddata="screenShootVideoPic" autoplay>
+        </video>
+      </div>
+      <!-- <img :src="fileStatus.videoPicUrl" alt="videoScreenShoot"> -->
+      <div class="uploadTextBox">
+        <el-input class="inputLine" v-model="fileStatus.title" placeholder="Title"></el-input>
+        <p class="text-length" :class="{red: fileStatus.title.length> limit.maxTitle}">
+          <span>{{fileStatus.title.length}} / {{limit.maxTitle}}</span>
+        </p>
+        <el-input class="inputLine" v-model="fileStatus.note" placeholder="Description"></el-input>
+        <p class="text-length" :class="{red: fileStatus.note.length>limit.maxNote}">
+          <span>{{fileStatus.note.length}} / {{limit.maxNote}}</span>
+        </p>
+        <div class="typeSelect inputLine tagBox">
+          <div class="tag">
+            <div class="borderRight">
+              <el-tag>Video Type</el-tag>
             </div>
-            <!-- <img :src="fileStatus.videoPicUrl" alt="videoScreenShoot"> -->
-            <div class="uploadTextBox">
-                <el-input class="inputLine" v-model="fileStatus.title" placeholder="Title"></el-input>
-                <p class="text-length" :class="{red: fileStatus.title.length> limit.maxTitle}">
-                    <span>{{fileStatus.title.length}} / {{limit.maxTitle}}</span>
-                </p>
-                <el-input class="inputLine" v-model="fileStatus.note" placeholder="Description"></el-input>
-                <p class="text-length" :class="{red: fileStatus.note.length>limit.maxNote}">
-                    <span>{{fileStatus.note.length}} / {{limit.maxNote}}</span>
-                </p>
-                <div class="typeSelect inputLine tagBox">
-                    <div class="tag">
-                        <div class="borderRight">
-                            <el-tag>Video Type</el-tag>
-                        </div>
-                    </div>
-                    <div>
-                        <el-radio v-model="fileStatus.videoType" label="Common" border size='mini'></el-radio>
-                        <el-radio v-model="fileStatus.videoType" label="VR" border size='mini'></el-radio>
-                    </div>
-                </div>
-                <div class="tagBox inputLine">
-                    <div class="tag">
-                        <div class="borderRight">
-                            <el-tag>Tag</el-tag>
-                        </div>
-                    </div>
-                    <div class="tagLists">
-                        <el-checkbox-group v-model="defaultTags" size="small">
-                            <el-checkbox label="Time-Lapse" border></el-checkbox>
-                            <el-checkbox label="Drone" border></el-checkbox>
-                            <el-checkbox label="Slow-Motion" border></el-checkbox>
-                        </el-checkbox-group>
-                        <el-tag :key="tag" v-for="tag in typeTags" closable :disable-transitions="false" @close="handleClose(tag,'typeTags')">
-                            {{tag}}
-                        </el-tag>
-                        <el-input class="input-new-tag" v-if="inputTagVisible" v-model="inputTagValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm('typeTags','inputTagVisible')" @blur="handleInputConfirm('typeTags','inputTagVisible')">
-                        </el-input>
-                        <el-button v-else class="button-new-tag" size="small" @click="showTagInput('inputTagVisible')">+ New Tag</el-button>
-                    </div>
-                </div>
-                <!-- <div class="tagBox inputLine">
+          </div>
+          <div>
+            <el-radio v-model="fileStatus.videoType" label="Common" border size='mini'></el-radio>
+            <el-radio v-model="fileStatus.videoType" label="VR" border size='mini'></el-radio>
+          </div>
+        </div>
+        <div class="tagBox inputLine">
+          <div class="tag">
+            <div class="borderRight">
+              <el-tag>Tag</el-tag>
+            </div>
+          </div>
+          <div class="tagLists">
+            <el-checkbox-group v-model="defaultTags" size="small">
+              <el-checkbox label="Time-Lapse" border></el-checkbox>
+              <el-checkbox label="Drone" border></el-checkbox>
+              <el-checkbox label="Slow-Motion" border></el-checkbox>
+            </el-checkbox-group>
+            <el-tag :key="tag" v-for="tag in typeTags" closable :disable-transitions="false" @close="handleClose(tag,'typeTags')">
+              {{tag}}
+            </el-tag>
+            <el-input class="input-new-tag" v-if="inputTagVisible" v-model="inputTagValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm('typeTags','inputTagVisible')" @blur="handleInputConfirm('typeTags','inputTagVisible')">
+            </el-input>
+            <el-button v-else class="button-new-tag" size="small" @click="showTagInput('inputTagVisible')">+ New Tag</el-button>
+          </div>
+        </div>
+        <!-- <div class="tagBox inputLine">
           <div class="tag">
             <div class="borderRight">
               <el-tag>Tools</el-tag>
@@ -90,54 +90,60 @@
             <el-button v-else class="button-new-tag" size="small" @click="showTagInput('inputTagToolsVisible')">+ New Tag</el-button>
           </div>
         </div> -->
-                <div class="setLocation inputLine tagBox">
-                    <div class="switch-flex">
-                        <span>Location </span>
-                        <div v-show="addressSwitch" class="addressText" @click='dialogVisible = true'>
-                            <span>{{locationAddress}}</span>
-                            <i v-show="locationAddress" class="el-icon-arrow-right"></i>
-                        </div>
-                        <el-switch v-model="addressSwitch" @change="toSwitchAdress"></el-switch>
-                    </div>
-                </div>
-                <div class="setCopyright inputLine tagBox">
-                    <div class="switch-flex">
-                        <span>Copyright Protection</span>
-                        <el-switch v-model='copyrightSwitch'></el-switch>
-                    </div>
-                    <div v-show="copyrightSwitch">
-                        <br/> Vevue will storage the video’s copyright information on BlockChain.
-                        <br/><br/> Please ensure that you are the original author, or we will force taking the copyright back and freeze your account forever. The legal consequences arising from you are borne by yourself.
-                    </div>
-                </div>
-                <div class="typeSelect inputLine tagBox">
-                    <div class="tag">
-                        <div class="borderRight">
-                            <el-tag>Price</el-tag>
-                        </div>
-                    </div>
-                    <div>
-                        <el-select v-model="fileStatus.price" placeholder="请选择">
-                            <el-option v-for="item in priceRange" :key="item.value" :label="item.label" :value="item.value">
-                            </el-option>
-                        </el-select>
-                    </div>
-                </div>
+        <div class="setLocation inputLine tagBox">
+          <div class="switch-flex">
+            <span>Location </span>
+            <div v-show="addressSwitch" class="addressText" @click='dialogVisible = true'>
+              <span>{{locationAddress}}</span>
+              <i v-show="locationAddress" class="el-icon-arrow-right"></i>
             </div>
-            <el-button type="primary" @click="toUploadVideo" :class="{disabled:uploadStatus}">Upload</el-button>
-            <!-- <el-button type="primary" @click="toUploadPicTest" :class="{disabled:uploadStatus}">Test</el-button> -->
+            <el-switch v-model="addressSwitch" @change="toSwitchAdress"></el-switch>
+          </div>
         </div>
-        <el-dialog title="" :close-on-click-modal='false' :visible.sync="dialogVisible" width="30%" :before-close="handleCloseDialog" id="mapDialog">
-            <div id="showmap">
-                <input type="text" id='searchTextField' class="controls searchTextField" placeholder="Search address">
-                <div id="map"></div>
-                <span class="address-text">{{locationAddressCache}}</span>
+        <div class="setCopyright inputLine tagBox">
+          <div class="switch-flex">
+            <span>Copyright Protection</span>
+            <el-switch v-model='copyrightSwitch'></el-switch>
+          </div>
+          <div v-show="copyrightSwitch">
+            <br/> Vevue will storage the video’s copyright information on BlockChain.
+            <br/><br/> Please ensure that you are the original author, or we will force taking the copyright back and freeze your account forever. The legal consequences arising from you are borne by yourself.
+                    </div>
+          </div>
+          <div class='setSplitter inputLine tagBox'>
+            <div class="switch-flex">
+              <span>Splitter</span>
+              <el-switch v-model='splitterSwitch'></el-switch>
             </div>
-            <div class="dialog-footer">
-                <el-button @click="handleCloseDialog">Cancel</el-button>
-                <el-button class="done" type="primary" @click="closeDialogSetAddress">Done</el-button>
+          </div>
+          <div class="typeSelect inputLine tagBox">
+            <div class="tag">
+              <div class="borderRight">
+                <el-tag>Price</el-tag>
+              </div>
             </div>
-        </el-dialog>
+            <div>
+              <el-select v-model="fileStatus.price" placeholder="请选择">
+                <el-option v-for="item in priceRange" :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+        </div>
+        <el-button type="primary" @click="toUploadVideo" :class="{disabled:uploadStatus}">Upload</el-button>
+        <!-- <el-button type="primary" @click="toUploadPicTest" :class="{disabled:uploadStatus}">Test</el-button> -->
+      </div>
+      <el-dialog title="" :close-on-click-modal='false' :visible.sync="dialogVisible" width="30%" :before-close="handleCloseDialog" id="mapDialog">
+        <div id="showmap">
+          <input type="text" id='searchTextField' class="controls searchTextField" placeholder="Search address">
+          <div id="map"></div>
+          <span class="address-text">{{locationAddressCache}}</span>
+        </div>
+        <div class="dialog-footer">
+          <el-button @click="handleCloseDialog">Cancel</el-button>
+          <el-button class="done" type="primary" @click="closeDialogSetAddress">Done</el-button>
+        </div>
+      </el-dialog>
     </div>
 </template>
 <script>
@@ -172,6 +178,7 @@ export default {
       toolsTags: [],
       addressSwitch: false,
       copyrightSwitch: false,
+      splitterSwitch: false,
       inputTagVisible: false,
       inputTagToolsVisible: false,
       priceRange: [
@@ -485,6 +492,7 @@ export default {
         data.location_name = '';
       }
       data.copyright = this.copyrightSwitch ? 'sign' : '';
+      data.splitter = this.splitterSwitch ? true : false;
       axios
         .post(this.apiUrl.vevueAPI + 'addvideo', data)
         .then(res => {
@@ -508,7 +516,7 @@ export default {
               duration: 800
             });
             setTimeout(() => {
-              location.href = location.origin +'/video/'+data.videoid;
+              location.href = location.origin + '/video/' + data.videoid;
             }, 900);
           } else {
             this.$message.error('upload failed');
@@ -658,292 +666,297 @@ export default {
 </script>
 <style lang="stylus">
 #showmap {
-    width: 100%;
-    height: 100%;
-    position: relative;
+  width: 100%;
+  height: 100%;
+  position: relative;
 
-    .address-text {
-        display: inline-block;
-        margin: 5px 0px;
-        font-size: 12px;
-    }
+  .address-text {
+    display: inline-block;
+    margin: 5px 0px;
+    font-size: 12px;
+  }
 }
 
 #map {
-    height: 400px;
-    width: 100%;
+  height: 400px;
+  width: 100%;
 }
 
 .topHeader {
-    display: flex;
-    height: 70px;
-    flex: 1;
-    align-items: center;
-    background-color: #fff;
-    justify-content: space-between;
-    padding: 0 20px;
+  display: flex;
+  height: 70px;
+  flex: 1;
+  align-items: center;
+  background-color: #fff;
+  justify-content: space-between;
+  padding: 0 20px;
 }
 
 .header-logo {
-    width: 155px;
-    height: 40px;
-    display: block;
+  width: 155px;
+  height: 40px;
+  display: block;
 }
 
 .videoBox {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+
+  &:hover .buttonBox {
+    display: block;
+  }
+
+  .buttonBox {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+  }
+
+  .video {
     position: relative;
-    margin: 0 auto;
     width: 100%;
-
-    &:hover .buttonBox {
-        display: block;
-    }
-
-    .buttonBox {
-        display: none;
-        position: absolute;
-        z-index: 1;
-        top: 50%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-    }
-
-    .video {
-        position: relative;
-        width: 100%;
-        height: 450px;
-        background-color: #333;
-    }
+    height: 450px;
+    background-color: #333;
+  }
 }
 
 .uploadTextBox {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .upload-demo {
-    text-align: center;
+  text-align: center;
 }
 
 .uploadBox {
-    max-width: 800px;
-    margin: 20px auto;
+  max-width: 800px;
+  margin: 20px auto;
 
-    .typeSelect {
-        padding: 10px;
-        border: solid #ccc 1px;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        color: #606266;
-
-        p:first-child {
-            margin-right: 20px;
-        }
-    }
-}
-
-.buttonBox {
-    .el-upload {
-        width: auto;
-        height: auto;
-    }
-
-    .el-button {
-        width: 210px;
-        height: 40px;
-    }
-}
-
-.reUploadVideo {
-    margin-bottom: 10px;
-}
-
-.el-upload {
-    width: 100%;
-    height: 450px;
-
-    .el-upload-dragger {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-    }
-
-    .el-icon-upload {
-        margin: 0;
-        line-height: inherit;
-    }
-}
-
-.inputLine {
-    margin-bottom: 10px;
-}
-
-.text-length {
-    text-align: right;
-    font-size: 14px;
-    margin-bottom: 5px;
-    margin-top: -5px;
-}
-
-.tagBox {
-    display: flex;
+  .typeSelect {
     padding: 10px;
     border: solid #ccc 1px;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #606266;
 
-    .tagLists {
-        .el-checkbox__input {
-            display: none;
-        }
+    p:first-child {
+      margin-right: 20px;
+    }
+  }
+}
 
-        .el-checkbox-group {
-            margin-bottom: 10px;
-        }
+.buttonBox {
+  .el-upload {
+    width: auto;
+    height: auto;
+  }
 
-        .el-checkbox.is-checked {
-            background-color: rgba(64, 158, 255, 0.1);
-            border: 1px solid rgba(64, 158, 255, 0.2);
-        }
+  .el-button {
+    width: 210px;
+    height: 40px;
+  }
+}
+
+.reUploadVideo {
+  margin-bottom: 10px;
+}
+
+.el-upload {
+  width: 100%;
+  height: 450px;
+
+  .el-upload-dragger {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .el-icon-upload {
+    margin: 0;
+    line-height: inherit;
+  }
+}
+
+.inputLine {
+  margin-bottom: 10px;
+}
+
+.text-length {
+  text-align: right;
+  font-size: 14px;
+  margin-bottom: 5px;
+  margin-top: -5px;
+}
+
+.tagBox {
+  display: flex;
+  padding: 10px;
+  border: solid #ccc 1px;
+  border-radius: 4px;
+
+  .tagLists {
+    .el-checkbox__input {
+      display: none;
     }
 
-    .tag .borderRight {
-        border-right: solid 1px #ccc;
-        margin-right: 10px;
+    .el-checkbox-group {
+      margin-bottom: 10px;
     }
 
-    .el-tag {
-        margin-right: 10px;
+    .el-checkbox.is-checked {
+      background-color: rgba(64, 158, 255, 0.1);
+      border: 1px solid rgba(64, 158, 255, 0.2);
     }
+  }
 
-    .button-new-tag {
-        margin-right: 10px;
-        height: 32px;
-        line-height: 30px;
-        padding-top: 0;
-        padding-bottom: 0;
-    }
+  .tag .borderRight {
+    border-right: solid 1px #ccc;
+    margin-right: 10px;
+  }
 
-    .input-new-tag {
-        width: 90px;
-        // margin-left: 10px;
-        vertical-align: bottom;
-    }
+  .el-tag {
+    margin-right: 10px;
+  }
+
+  .button-new-tag {
+    margin-right: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .input-new-tag {
+    width: 90px;
+    // margin-left: 10px;
+    vertical-align: bottom;
+  }
 }
 
 .pac-container {
-    z-index: 9999;
+  z-index: 9999;
 }
 
 .searchTextField {
-    // position: absolute;
-    width: 100%;
-    margin: 10px 0px;
-    z-index: 1;
-    padding: 10px;
-    border: solid 1px #ccc;
-    border-radius: 2px;
-    top: 2px;
-    left: 2px;
-    outline: none;
-    font-size: 14px;
+  // position: absolute;
+  width: 100%;
+  margin: 10px 0px;
+  z-index: 1;
+  padding: 10px;
+  border: solid 1px #ccc;
+  border-radius: 2px;
+  top: 2px;
+  left: 2px;
+  outline: none;
+  font-size: 14px;
 }
 
 .addressText {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .switch-flex {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
 }
 
 .setLocation {
-    font-size: 12px;
-    color: #606266;
+  font-size: 12px;
 
-    .border {
-        border-top: solid 1px #ccc;
-        border-bottom: solid 1px #ccc;
-        padding: 5px 0px;
-    }
+  .border {
+    border-top: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;
+    padding: 5px 0px;
+  }
 
-    .addressText {
-        flex: 1;
-        display: inline-block;
-        margin-left: 20px;
-        color: #409EFF;
-    }
+  .addressText {
+    flex: 1;
+    display: inline-block;
+    margin-left: 20px;
+    color: #409EFF;
+  }
 }
 
 .setCopyright {
-    font-size: 12px;
-    // flex-direction: column;
-    flex-wrap: wrap;
+  font-size: 12px;
+  // flex-direction: column;
+  flex-wrap: wrap;
 
-    .border {
-        border-top: solid 1px #ccc;
-        border-bottom: solid 1px #ccc;
-        padding: 5px 0px;
-    }
+  .border {
+    border-top: solid 1px #ccc;
+    border-bottom: solid 1px #ccc;
+    padding: 5px 0px;
+  }
+}
+
+.setSplitter {
+  font-size: 12px;
+  // flex-direction: column;
+  flex-wrap: wrap;
 }
 
 .el-progress-bar__outer {
-    border-radius: 0px;
-    background-color: #409eff;
+  border-radius: 0px;
+  background-color: #409eff;
 
-    .el-progress-bar__inner {
-        border-radius: 0px;
-    }
+  .el-progress-bar__inner {
+    border-radius: 0px;
+  }
 }
 
 .topHeader {
-    // height: 90px;
+  // height: 90px;
 }
 
 .uploadProgress {
-    &.width100Per {
-        width: 100%;
-    }
+  &.width100Per {
+    width: 100%;
+  }
 
-    transition: 1s all;
-    width: 0px;
-    z-index: 99999;
-    top: 0px;
+  transition: 1s all;
+  width: 0px;
+  z-index: 99999;
+  top: 0px;
 }
 
 .el-button--primary {
-    display: block;
-    margin: auto;
+  display: block;
+  margin: auto;
 }
 
 .el-switch {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 
 .dialog-footer {
-    display: flex;
-    margin-top: 10px;
-    justify-content: space-between;
+  display: flex;
+  margin-top: 10px;
+  justify-content: space-between;
 
-    .done {
-        margin: 0px;
-    }
+  .done {
+    margin: 0px;
+  }
 }
 
 .el-dialog__body {
-    padding-top: 5px !important;
+  padding-top: 5px !important;
 }
 
 .toPlay.iconfont {
-    position: absolute;
-    font-size: 70px;
-    bottom: 40px;
-    color: #fff;
-    text-shadow: #000;
-    left: 0px;
+  position: absolute;
+  font-size: 70px;
+  bottom: 40px;
+  color: #fff;
+  text-shadow: #000;
+  left: 0px;
 }
 </style>

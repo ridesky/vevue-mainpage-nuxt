@@ -320,11 +320,12 @@ export default {
       videoid: context.params.videoid
     });
     result = result.data;
+    console.log(result);
     if (result.errcode === 0) {
       return {
         videoSeoTitle: result.title,
         videoSeoNote: result.note,
-        videoLink: result.link
+        videoLink: result.link||context.params.videoid
       };
     } else {
       return {
