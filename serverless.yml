@@ -1,11 +1,13 @@
-
-service: app # NOTE: update this with your service name
+# org: greatcodeeer
+app: vevue
+service: web
 
 provider:
   name: aws
-  runtime: nodejs8.10
-  stage: beta
+  runtime: nodejs10.x
+  stage: ${opt:stage, 'dev'}
   region: us-east-1
+  lambdaHashingVersion: 20201221
 
 functions:
   nuxt:
@@ -20,7 +22,7 @@ functions:
 
 plugins:
   - serverless-apigw-binary
- 
+
 custom:
   apigwBinary:
     types:

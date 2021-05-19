@@ -1,168 +1,279 @@
 <template>
-    <div>
-        <div class="head-navigation-layout">
-            <el-container>
-                <el-header>
-                    <div class="topHeader">
-                        <div class="topHeader-inner">
-                            <div class="logoBox">
-                                <a href="/">
-                                    <img src="../assets/images/logo-01.png" alt="vevue" class="header-logo">
-                                </a>
-                            </div>
-                            <ul class="topMenu">
-                                <li>
-                                    <router-link to='/main' active-class='router-link-exact-active main'>
-                                        <i class="iconfont icon-earth"></i>
-                                        <span class="menuTitle">Main</span>
-                                    </router-link>
-                                </li>
-                                <li>
-                                    <router-link to='/focus' active-class='router-link-exact-active focus'>
-                                        <i class="iconfont icon-focus"></i>
-                                        <span class="menuTitle">Focus</span>
-                                    </router-link>
-                                </li>
-                                <li>
-                                    <router-link to='/likes' active-class='router-link-exact-active like'>
-                                        <i class="iconfont icon-like"></i>
-                                        <i class="iconfont icon-like-heart"></i>
-                                        <span class="menuTitle">Likes</span>
-                                    </router-link>
-                                </li>
-                                <li>
-                                    <router-link to='/unlock' active-class='router-link-exact-active unlock'>
-                                        <i class="iconfont icon-unlock"></i>
-                                        <span class="menuTitle">Unlock</span>
-                                    </router-link>
-                                </li>
-                                <li>
-                                    <router-link to='/history' active-class='router-link-exact-active history'>
-                                        <i class="iconfont icon-history"></i>
-                                        <span class="menuTitle">History</span>
-                                    </router-link>
-                                </li>
-                                <li>
-                                    <router-link to='/playlist' active-class='router-link-exact-active delay'>
-                                        <i class="iconfont icon-watch_later"></i>
-                                        <i class="iconfont icon-like-heart"></i>
-                                        <span class="menuTitle">Watch Later</span>
-                                    </router-link>
-                                </li>
-                            </ul>
-                            <no-ssr>
-                                <div class="top-searchbar" v-clickoutside="function(){showSwitch.searchPannel = false}">
-                                    <!-- @input="setSearchStatus" -->
-                                    <el-input @input="setSearchStatus" @focus="toShowSearchPannel" size='mini' @keyup.enter.native='toSearchVideo(search.keyword,false)' v-model="search.keyword" placeholder="Search" prefix-icon="el-icon-search">
-                                        <i slot="suffix" class="el-input__icon el-icon-error" v-show="search.keyword.length >0" @click="search.keyword='';search.status=0"></i>
-                                    </el-input>
-                                    <div class="search-pannel-pc" v-show="showSwitch.searchPannel">
-                                        <div class='tri'></div>
-                                        <div class="hot-detail" v-show="search.status === 0 ">
-                                            <div class="trending">
-                                                <h3>Trending</h3>
-                                                <div @click="toSearchVideo(item,false)" class="hotkeytag" size="small" type="info" v-for="(item,index) in hotkey" :key="index">{{item}}</div>
-                                            </div>
-                                            <div class="history" v-if="search.history.length>0">
-                                                <h3>History</h3>
-                                                <div v-for="(item,index) in search.history" :key="index" class="history-item">
-                                                    <i class="el-icon-time" @click="toSearchVideo(item,false)"></i>
-                                                    <p class="item-text" @click="toSearchVideo(item,false)">{{item}}</p>
-                                                    <i class="el-icon-close" @click="removeSearchHistory(index)"></i>
-                                                </div>
-                                                <div class="cleanhistory" v-if='search.history.length>=5' @click="removeSearchHistory()">
-                                                    <i class="el-icon-delete"></i>
-                                                    <p>Clean search history</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="search-keylist" v-show="search.status === 1">
-                                            <div v-for="(item,index) in search.keylist" :key="index" class="keylist-item" @click="toSearchVideo(item,false)">
-                                                <i class="el-icon-search"></i>
-                                                <p>{{item}}</p>
-                                            </div>
-                                            <div class="keylist-item searchall" @click="toSearchVideo(search.keyword,false)">View 「{{search.keyword}}」 results</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </no-ssr>
-                            <div class="topRight-button">
-                                <div class="toUpload" v-if="userInfo">
-                                    <a href="/upload" target="_blank">
-                                        <i class="iconfont icon-upload"></i>
-                                        <span>Upload</span>
-                                    </a>
-                                </div>
-                                <div class="personal">
-                                    <div v-clickoutside='closePersonPannel' v-if="userInfo" @click="showPersonPannel = !showPersonPannel">
-                                        <img v-if="userInfo.avatarid" class="topUserAvatar" :src="userInfo.avatar" :onerror='defaultAvatarLogo' alt="">
-                                        <!-- <i v-else alt="" class="topUserAvatar iconfont icon-personal"></i> -->
-                                        <img v-else class="topUserAvatar" src="../assets/images/vevue_logo_50x50.png" alt="">
-                                        <div class="person-pannel" v-show="showPersonPannel">
-                                            <div class="tri"></div>
-                                            <router-link class="list" :to="'/user/' + userInfo.userid +'/works'">
-                                                <i class="iconfont icon-personal"></i>
-                                                <span>My page</span>
-                                            </router-link>
-                                            <!-- <a :href="'/user/' + userInfo.userid +'/works'" class="list">
+  <div>
+    <div class="head-navigation-layout">
+      <el-container>
+        <el-header>
+          <div class="topHeader">
+            <div class="topHeader-inner">
+              <div class="logoBox">
+                <a href="/">
+                  <img
+                    src="../assets/images/logo-01.png"
+                    alt="vevue"
+                    class="header-logo"
+                  />
+                </a>
+              </div>
+              <ul class="topMenu">
+                <li>
+                  <router-link
+                    to="/main"
+                    active-class="router-link-exact-active main"
+                  >
+                    <i class="iconfont icon-earth"></i>
+                    <span class="menuTitle">Main</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/focus"
+                    active-class="router-link-exact-active focus"
+                  >
+                    <i class="iconfont icon-focus"></i>
+                    <span class="menuTitle">Focus</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/likes"
+                    active-class="router-link-exact-active like"
+                  >
+                    <i class="iconfont icon-like"></i>
+                    <i class="iconfont icon-like-heart"></i>
+                    <span class="menuTitle">Likes</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/unlock"
+                    active-class="router-link-exact-active unlock"
+                  >
+                    <i class="iconfont icon-unlock"></i>
+                    <span class="menuTitle">Unlock</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/history"
+                    active-class="router-link-exact-active history"
+                  >
+                    <i class="iconfont icon-history"></i>
+                    <span class="menuTitle">History</span>
+                  </router-link>
+                </li>
+                <li>
+                  <router-link
+                    to="/playlist"
+                    active-class="router-link-exact-active delay"
+                  >
+                    <i class="iconfont icon-watch_later"></i>
+                    <i class="iconfont icon-like-heart"></i>
+                    <span class="menuTitle">Watch Later</span>
+                  </router-link>
+                </li>
+              </ul>
+              <no-ssr>
+                <div class="top-searchbar" v-clickoutside="hideSearchPannel">
+                  <!-- @input="setSearchStatus" -->
+                  <el-input
+                    @input="setSearchStatus"
+                    @focus="toShowSearchPannel"
+                    size="mini"
+                    @keyup.enter.native="toSearchVideo(search.keyword, false)"
+                    v-model="search.keyword"
+                    placeholder="Search"
+                    prefix-icon="el-icon-search"
+                  >
+                    <i
+                      slot="suffix"
+                      class="el-input__icon el-icon-error"
+                      v-show="search.keyword.length > 0"
+                      @click="
+                        search.keyword = '';
+                        search.status = 0;
+                      "
+                    ></i>
+                  </el-input>
+                  <div
+                    class="search-pannel-pc"
+                    v-show="showSwitch.searchPannel"
+                  >
+                    <div class="tri"></div>
+                    <div class="hot-detail" v-show="search.status === 0">
+                      <div class="trending">
+                        <h3>Trending</h3>
+                        <div
+                          @click="toSearchVideo(item, false)"
+                          class="hotkeytag"
+                          size="small"
+                          type="info"
+                          v-for="(item, index) in hotkey"
+                          :key="index"
+                        >
+                          {{ item }}
+                        </div>
+                      </div>
+                      <div class="history" v-if="search.history.length > 0">
+                        <h3>History</h3>
+                        <div
+                          v-for="(item, index) in search.history"
+                          :key="index"
+                          class="history-item"
+                        >
+                          <i
+                            class="el-icon-time"
+                            @click="toSearchVideo(item, false)"
+                          ></i>
+                          <p
+                            class="item-text"
+                            @click="toSearchVideo(item, false)"
+                          >
+                            {{ item }}
+                          </p>
+                          <i
+                            class="el-icon-close"
+                            @click="removeSearchHistory(index)"
+                          ></i>
+                        </div>
+                        <div
+                          class="cleanhistory"
+                          v-if="search.history.length >= 5"
+                          @click="removeSearchHistory()"
+                        >
+                          <i class="el-icon-delete"></i>
+                          <p>Clean search history</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="search-keylist" v-show="search.status === 1">
+                      <div
+                        v-for="(item, index) in search.keylist"
+                        :key="index"
+                        class="keylist-item"
+                        @click="toSearchVideo(item, false)"
+                      >
+                        <i class="el-icon-search"></i>
+                        <p>{{ item }}</p>
+                      </div>
+                      <div
+                        class="keylist-item searchall"
+                        @click="toSearchVideo(search.keyword, false)"
+                      >
+                        View 「{{ search.keyword }}」 results
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </no-ssr>
+              <div class="topRight-button">
+                <div class="toUpload" v-if="userInfo">
+                  <a href="/upload" target="_blank">
+                    <i class="iconfont icon-upload"></i>
+                    <span>Upload</span>
+                  </a>
+                </div>
+                <div class="personal">
+                  <div
+                    v-clickoutside="closePersonPannel"
+                    v-if="userInfo"
+                    @click="showPersonPannel = !showPersonPannel"
+                  >
+                    <img
+                      v-if="userInfo.avatarid"
+                      class="topUserAvatar"
+                      :src="userInfo.avatar"
+                      :onerror="defaultAvatarLogo"
+                      alt=""
+                    />
+                    <!-- <i v-else alt="" class="topUserAvatar iconfont icon-personal"></i> -->
+                    <img
+                      v-else
+                      class="topUserAvatar"
+                      src="../assets/images/vevue_logo_50x50.png"
+                      alt=""
+                    />
+                    <div class="person-pannel" v-show="showPersonPannel">
+                      <div class="tri"></div>
+                      <router-link
+                        class="list"
+                        :to="'/user/' + userInfo.userid + '/works'"
+                      >
+                        <i class="iconfont icon-personal"></i>
+                        <span>My page</span>
+                      </router-link>
+                      <!-- <a :href="'/user/' + userInfo.userid +'/works'" class="list">
                                                 <i class="iconfont icon-personal"></i>
                                                 <span>My page</span>
                                             </a> -->
-                                            <router-link class="list" :to="'/likes/'">
-                                                <i class="iconfont icon-like"></i>
-                                                <span>Likes</span>
-                                            </router-link>
-                                            <div class="list list-border" :to="'/pin/'" @click="showSwitch.messageDialog = true">
-                                                <i class="el-icon-message"></i>
-                                                <span>Message</span>
-                                            </div>
-                                            <router-link class="list list-border" :to="'/pin/'">
-                                                <i class="iconfont icon-pin"></i>
-                                                <span>Pin</span>
-                                            </router-link>
-                                            <router-link class="list list-border" :to="'/task/'">
-                                                <i class="el-icon-bell"></i>
-                                                <span>Task</span>
-                                            </router-link>
-                                            <router-link class="list list-border" :to="'/setting/'">
-                                                <i class="iconfont icon-setting"></i>
-                                                <span>Setting</span>
-                                            </router-link>
-                                            <a class="list" @click="toLogout">
-                                                <div class="personal">
-                                                    <i class="iconfont icon-logout" v-if="userInfo" title="Log out" style="cursor:pointer"></i>
-                                                    <span @click="toLogout">Sign out</span>
-                                                    <div class="userSetting">
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <a href="/login" v-else>
-                                        <i class="iconfont icon-personal"></i>
-                                    </a>
-                                </div>
-                            </div>
+                      <router-link class="list" :to="'/likes/'">
+                        <i class="iconfont icon-like"></i>
+                        <span>Likes</span>
+                      </router-link>
+                      <div
+                        class="list list-border"
+                        :to="'/pin/'"
+                        @click="showSwitch.messageDialog = true"
+                      >
+                        <i class="el-icon-message"></i>
+                        <span>Message</span>
+                      </div>
+                      <router-link class="list list-border" :to="'/pin/'">
+                        <i class="iconfont icon-pin"></i>
+                        <span>Pin</span>
+                      </router-link>
+                      <router-link class="list list-border" :to="'/task/'">
+                        <i class="el-icon-bell"></i>
+                        <span>Task</span>
+                      </router-link>
+                      <router-link class="list list-border" :to="'/setting/'">
+                        <i class="iconfont icon-setting"></i>
+                        <span>Setting</span>
+                      </router-link>
+                      <a class="list" @click="toLogout">
+                        <div class="personal">
+                          <i
+                            class="iconfont icon-logout"
+                            v-if="userInfo"
+                            title="Log out"
+                            style="cursor:pointer"
+                          ></i>
+                          <span @click="toLogout">Sign out</span>
+                          <div class="userSetting"></div>
                         </div>
+                      </a>
                     </div>
-                </el-header>
-            </el-container>
-        </div>
-        <el-dialog class='messageDialog' title="Message" width="25%" height='80%' top="5vh" :visible.sync="showSwitch.messageDialog">
-            <message/>
-        </el-dialog>
-        <nuxt keep-alive />
+                  </div>
+                  <a href="/login" v-else>
+                    <i class="iconfont icon-personal"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </el-header>
+      </el-container>
     </div>
-
+    <el-dialog
+      class="messageDialog"
+      title="Message"
+      width="25%"
+      height="80%"
+      top="5vh"
+      :visible.sync="showSwitch.messageDialog"
+    >
+      <message />
+    </el-dialog>
+    <nuxt keep-alive />
+  </div>
 </template>
 <script>
-import Vue from 'vue';
-import axios from 'axios';
-import apiUrl from '../assets/js/config/urlConfig.js';
-import docCookies from '../static/tools/cookies.js';
-import totp from '../static/tools/totp.js';
-import message from '../components/message.vue';
-Vue.directive('clickoutside', {
+import Vue from "vue";
+import axios from "axios";
+import apiUrl from "../assets/js/config/urlConfig.js";
+import docCookies from "../static/tools/cookies.js";
+import totp from "../static/tools/totp.js";
+import message from "../components/message.vue";
+Vue.directive("clickoutside", {
   bind: function(el, binding, vnode) {
     function documentHandler(e) {
       /* console.log(el);
@@ -172,7 +283,7 @@ Vue.directive('clickoutside', {
         binding.value(e);
       }
     }
-    document.addEventListener('click', documentHandler);
+    document.addEventListener("click", documentHandler);
   }
 });
 export default {
@@ -183,45 +294,45 @@ export default {
     return {
       script: [
         {
-          src: '//vjs.zencdn.net/7.0/video.min.js'
+          src: "//vjs.zencdn.net/7.0/video.min.js"
         },
         {
-          src: '//cdn.jsdelivr.net/npm/danmaku@1.3.5/dist/danmaku.js'
+          src: "//cdn.jsdelivr.net/npm/danmaku@1.3.5/dist/danmaku.js"
         },
         {
-          src: '//storage.googleapis.com/vrview/2.0/build/vrview.min.js'
-        },
-        {
-          src:
-            '//maps.googleapis.com/maps/api/js?key=AIzaSyD6Zh2AjPRc9CN7qMLKUxAHxBw_M57RbwU&libraries=places'
+          src: "//storage.googleapis.com/vrview/2.0/build/vrview.min.js"
         },
         {
           src:
-            '//developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js'
+            "//maps.googleapis.com/maps/api/js?key=AIzaSyD6Zh2AjPRc9CN7qMLKUxAHxBw_M57RbwU&libraries=places"
+        },
+        {
+          src:
+            "//developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"
         }
       ]
     };
   },
   data() {
     return {
-      userInfo: '',
+      userInfo: "",
       defaultAvatarLogo:
-        'this.src="' + require('../assets/images/vevue_logo_50x50.png') + '"',
+        'this.src="' + require("../assets/images/vevue_logo_50x50.png") + '"',
       defaultCoverLogo:
-        'this.src="' + require('../assets/images/default_cover.png') + '"',
+        'this.src="' + require("../assets/images/default_cover.png") + '"',
       showPersonPannel: false, // 显示右上角个人面板
       apiUrl,
       collapseMenu: true, // 是否隐藏菜单栏
-      radio: '1',
-      route: '',
+      radio: "1",
+      route: "",
       hotkey: [],
       search: {
-        keyword: '',
+        keyword: "",
         status: 0,
         keylist: [],
         history: process.client
-          ? docCookies.getItem('searchHistory')
-            ? docCookies.getItem('searchHistory').split(',')
+          ? docCookies.getItem("searchHistory")
+            ? docCookies.getItem("searchHistory").split(",")
             : [] || []
           : []
       },
@@ -242,19 +353,19 @@ export default {
       if (index >= 0) {
         this.search.history.splice(index, 1);
         docCookies.setItem(
-          'searchHistory',
+          "searchHistory",
           this.search.history,
           this.cookiesEnd,
-          '/',
+          "/",
           null
         );
       } else {
         this.search.history = [];
         docCookies.setItem(
-          'searchHistory',
+          "searchHistory",
           this.search.history,
           this.cookiesEnd,
-          '/',
+          "/",
           null
         );
       }
@@ -277,14 +388,14 @@ export default {
     },
     getHotkey() {
       axios
-        .post(apiUrl.vevueAPI + 'hotkeylist', {
-          userid: docCookies.getItem('userid') || '-',
-          towho: docCookies.getItem('userid') || '-',
-          authcode: docCookies.getItem('userid')
-            ? totp.getCode(docCookies.getItem('safekey'))
-            : '',
-          cid: docCookies.getItem('cid'),
-          type: 'hotkeylist',
+        .post(apiUrl.vevueAPI + "hotkeylist", {
+          userid: docCookies.getItem("userid") || "-",
+          towho: docCookies.getItem("userid") || "-",
+          authcode: docCookies.getItem("userid")
+            ? totp.getCode(docCookies.getItem("safekey"))
+            : "",
+          cid: docCookies.getItem("cid"),
+          type: "hotkeylist",
           offset: 0,
           timestamp: Math.floor(new Date().getTime() / 1000)
         })
@@ -301,67 +412,70 @@ export default {
       //   this.showSwitch.showNomore = false; // 如果之前的搜索没有结果 并且显示了 no result 图标,关闭之
       //   this.showSwitch.hideLoading = false;
       clearTimeout(this.searchTimeout);
-      this.searchTimeout = setTimeout(() => {
-        axios
-          .post(apiUrl.vevueAPI + 'scan', {
-            userid: docCookies.getItem('userid') || '-',
-            authcode: docCookies.getItem('userid')
-              ? totp.getCode(docCookies.getItem('safekey'))
-              : '',
-            cid: docCookies.getItem('cid'),
-            timestamp: Math.floor(new Date().getTime() / 1000),
-            keyword: keyword,
-            onlykey: onlykey
-          })
-          .then(res => {
-            if (res.data.errcode === 0) {
-              this.showSwitch.hideLoading = true;
-              const data = res.data;
-              this.search.keylist = data.keylist || [];
-              let videos = res.data.videolist || [];
-              if (videos.length === 0) {
-                this.showSwitch.showNomore = true;
-              } else {
-                this.showSwitch.showNomore = false;
-              }
-              videos.map(item => {
-                if (
-                  ['respond', 'vevue', 'vr', 'topics'].some(value => {
-                    return value === item.videotype;
-                  })
-                ) {
-                  Object.assign(item, {
-                    playerURL: apiUrl.playerURL + '?videoid=' + item.videoid,
-                    date: jsFormat.smartTime(new Date(item.timestamp * 1000)),
-                    coverURL:
-                      apiUrl.videoURL + item.videoid.split('::')[0] + '.jpg',
-                    avatar: apiUrl.avatarURL + item.avatar + '.jpg'
-                  });
-                  // item.yuan = JSON.parse(item.yuan);
-                  Object.assign(item.yuan, {
-                    nickname: item.yuan.nickname,
-                    location_name: item.yuan.location_name,
-                    title: item.yuan.title,
-                    note: item.yuan.note
-                  });
-                  this.videos = videos;
-                } else if (item.videotype === 'hash') {
-                  docCookies.setItem(
-                    'hashfollow',
-                    item.hashfollow,
-                    that.cookiesEnd,
-                    '/',
-                    null
-                  );
+      this.searchTimeout = setTimeout(
+        () => {
+          axios
+            .post(apiUrl.vevueAPI + "scan", {
+              userid: docCookies.getItem("userid") || "-",
+              authcode: docCookies.getItem("userid")
+                ? totp.getCode(docCookies.getItem("safekey"))
+                : "",
+              cid: docCookies.getItem("cid"),
+              timestamp: Math.floor(new Date().getTime() / 1000),
+              keyword: keyword,
+              onlykey: onlykey
+            })
+            .then(res => {
+              if (res.data.errcode === 0) {
+                this.showSwitch.hideLoading = true;
+                const data = res.data;
+                this.search.keylist = data.keylist || [];
+                let videos = res.data.videolist || [];
+                if (videos.length === 0) {
+                  this.showSwitch.showNomore = true;
+                } else {
+                  this.showSwitch.showNomore = false;
                 }
-              });
-              //   this.videos = data.videolist;
-            }
-          })
-          .catch(() => {
-            this.showSwitch.hideLoading = true;
-          });
-      }, onlykey ? 500 : 0);
+                videos.map(item => {
+                  if (
+                    ["respond", "vevue", "vr", "topics"].some(value => {
+                      return value === item.videotype;
+                    })
+                  ) {
+                    Object.assign(item, {
+                      playerURL: apiUrl.playerURL + "?videoid=" + item.videoid,
+                      date: jsFormat.smartTime(new Date(item.timestamp * 1000)),
+                      coverURL:
+                        apiUrl.videoURL + item.videoid.split("::")[0] + ".jpg",
+                      avatar: apiUrl.avatarURL + item.avatar + ".jpg"
+                    });
+                    // item.yuan = JSON.parse(item.yuan);
+                    Object.assign(item.yuan, {
+                      nickname: item.yuan.nickname,
+                      location_name: item.yuan.location_name,
+                      title: item.yuan.title,
+                      note: item.yuan.note
+                    });
+                    this.videos = videos;
+                  } else if (item.videotype === "hash") {
+                    docCookies.setItem(
+                      "hashfollow",
+                      item.hashfollow,
+                      that.cookiesEnd,
+                      "/",
+                      null
+                    );
+                  }
+                });
+                //   this.videos = data.videolist;
+              }
+            })
+            .catch(() => {
+              this.showSwitch.hideLoading = true;
+            });
+        },
+        onlykey ? 500 : 0
+      );
     },
     toSearchVideo(keyword) {
       /**
@@ -375,15 +489,18 @@ export default {
       if (!hasword) {
         this.search.history.push(keyword);
         docCookies.setItem(
-          'searchHistory',
+          "searchHistory",
           this.search.history,
           this.cookiesEnd,
-          '/',
+          "/",
           null
         );
       }
 
-      this.$router.push('/search?keyword=' + keyword);
+      this.$router.push("/search?keyword=" + keyword);
+    },
+    hideSearchPannel() {
+      this.showSwitch.searchPannel = false;
     },
     closePersonPannel() {
       this.showPersonPannel = false;
@@ -395,18 +512,18 @@ export default {
     },
     addListenerResize() {},
     toLogout() {
-      ['userid', 'avatar', 'cid', 'gender', 'nickname', 'safekey'].map(item => {
-        docCookies.removeItem(item, '/');
+      ["userid", "avatar", "cid", "gender", "nickname", "safekey"].map(item => {
+        docCookies.removeItem(item, "/");
       });
       window.location.reload();
     },
     getUserInfo() {
-      if (docCookies.getItem('userid')) {
+      if (docCookies.getItem("userid")) {
         this.userInfo = {};
-        this.userInfo.userid = docCookies.getItem('userid');
-        this.userInfo.avatarid = docCookies.getItem('avatar');
+        this.userInfo.userid = docCookies.getItem("userid");
+        this.userInfo.avatarid = docCookies.getItem("avatar");
         this.userInfo.avatar =
-          apiUrl.avatarURL + docCookies.getItem('avatar') + '.jpg';
+          apiUrl.avatarURL + docCookies.getItem("avatar") + ".jpg";
       }
     },
     toggleCollapse() {
@@ -766,4 +883,3 @@ body {
     }
 }
 </style>
-
