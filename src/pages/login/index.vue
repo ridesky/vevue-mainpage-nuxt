@@ -73,16 +73,19 @@ export default {
         const signature = await vevueWeb3.eth.personal.sign(message, addr);
         console.log(`sign is ${signature}`);
         axios
-          .post(
-            "https://mefb40k3j3.execute-api.us-east-1.amazonaws.com/dev/recover",
-            {
-              message,
-              signature,
-              addr
-            }
-          )
+          .post(apiUrl.signUrl, {
+            message,
+            signature,
+            addr
+          })
           .then(res => {
-            console.log(res.data);
+            if (res.data.data.result == true) {
+              this.$message({
+                message: `Login success with ${addr}`,
+                iconClass: "",
+                type: "success"
+              });
+            }
             return;
             if (res.data.errcode === 0) {
               let data = res.data.result;
