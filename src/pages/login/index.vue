@@ -24,7 +24,6 @@
 import axios from "axios";
 import Web3 from "web3";
 import apiUrl from "../../assets/js/config/urlConfig.js";
-import { reward } from "../../assets/js/metamask";
 export default {
   data() {
     let result = {
@@ -36,7 +35,6 @@ export default {
     return result;
   },
   mounted() {
-    window.reward = reward;
     window.vue = this;
     if (!window.ethereum) {
       return;

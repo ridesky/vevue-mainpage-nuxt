@@ -37,6 +37,10 @@ module.exports = {
     {
       src: "~plugins/ElementUI",
       ssr: true
+    },
+    {
+      src: "~plugins/metamask",
+      ssr: true
     }
   ],
   css: [
