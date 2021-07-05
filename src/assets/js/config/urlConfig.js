@@ -4,7 +4,7 @@ const urlConfig = {
   videoURL: "https://file.vevue.com/video/", // 视频地址
   avatarURL: "https://file.vevue.com/avatar/", // 头像地址
   coverURL: "https://file.vevue.com/cover/", // 封面地址
-  signUrl: "https://chain.vevue.com/recover", // 签名验证
-  checkTransfer: "https://chain.vevue.com/check_transfer" // 验证转账
+  signUrl: "https://api.vevue.com/check_signature/", // 签名验证
+  checkTransfer: "https://api.vevue.com/check_transfer/" // 验证转账
 };
 module.exports = urlConfig;

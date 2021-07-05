@@ -24,11 +24,12 @@
 import axios from "axios";
 import Web3 from "web3";
 import apiUrl from "../../assets/js/config/urlConfig.js";
+import docCookies from '../../static/tools/cookies'
 export default {
   data() {
     let result = {
       isConnecting: false,
-      signMessageTemp: "Signature for login @",
+      signMessage: "Signature for login @",
       vevueWeb3: "",
       apiUrl
     };
@@ -67,7 +68,7 @@ export default {
         });
         const addr = accounts[0] || null;
         const currentTime = Math.floor(new Date().getTime() / 1000);
-        const message = `${this.signMessageTemp}${currentTime}`;
+        const message = `${this.signMessage}${currentTime}`;
         const signature = await vevueWeb3.eth.personal.sign(message, addr);
         console.log(`sign is ${signature}`);
         axios
@@ -77,52 +78,22 @@ export default {
             addr
           })
           .then(res => {
-            if (res.data.data.result == true) {
+            if (res.data.errcode === 0 || res.data.code === 200) {
               this.$message({
                 message: `Login success with ${addr}`,
                 iconClass: "",
                 type: "success"
               });
-            }
-            return;
-            if (res.data.errcode === 0) {
-              let data = res.data.result;
-              docCookies.setItem(
-                "userid",
-                data.userid,
-                this.cookiesEnd,
-                "/",
-                null
-              );
-              docCookies.setItem("cid", data.cid, this.cookiesEnd, "/", null);
-              docCookies.setItem(
-                "safekey",
-                data.safekey,
-                this.cookiesEnd,
-                "/",
-                null
-              );
-              docCookies.setItem(
-                "avatar",
-                data.avatar,
-                this.cookiesEnd,
-                "/",
-                null
-              );
-              docCookies.setItem(
-                "nickname",
-                data.nickname,
-                this.cookiesEnd,
-                "/",
-                null
-              );
-              docCookies.setItem(
-                "gender",
-                data.gender,
-                this.cookiesEnd,
-                "/",
-                null
-              );
+              let userinfo = res.data.data.userinfo;
+              Object.keys(userinfo).map((key, value) => {
+                docCookies.setItem(
+                  key,
+                  userinfo[key] || "",
+                  this.cookiesEnd,
+                  "/",
+                  null
+                );
+              });
               if (this.GetQueryString("continue")) {
                 location.href = decodeURIComponent(
                   this.GetQueryString("continue")
@@ -144,7 +115,7 @@ export default {
           .catch(err => {
             this.$message({
               showClose: true,
-              message: error.message || "login failed",
+              message: err.message || "login failed",
               iconClass: "",
               type: "error"
             });
