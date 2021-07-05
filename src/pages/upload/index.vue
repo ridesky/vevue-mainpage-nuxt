@@ -473,6 +473,9 @@ export default {
       data.cid = docCookies.getItem('cid');
       data.note = fileStatus.note;
       data.title = fileStatus.title;
+      data.size  = Math.floor(fileStatus.size / 1048576);
+      data.width = fileStatus.width || 0;
+      data.height = fileStatus.height || 0;
       data.unitlock = fileStatus.unitlock;
       data.timestamp = Math.floor(new Date().getTime() / 1000);
       data.authcode = authcode;
@@ -561,11 +564,13 @@ export default {
       this.fileStatus.videoPicUrl = '';
       this.fileStatus.videoPicBlob = '';
       this.fileStatus.File = e.raw;
-      this.fileStatus.videoUrl = e.url; // blog文件地址
+      this.fileStatus.videoUrl = URL.createObjectURL(e.raw); // blog文件地址
       this.fileStatus.name = e.name;
       this.fileStatus.size = e.size;
       let videoEle = document.getElementById('videoEle');
       videoEle.addEventListener('loadeddata', () => {
+        this.fileStatus.width = videoEle.videoWidth;
+        this.fileStatus.height = videoEle.videoHeight;
         this.fileStatus.video_time = Math.ceil(videoEle.duration);
       });
     },
