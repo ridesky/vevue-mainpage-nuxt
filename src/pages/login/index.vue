@@ -3,11 +3,7 @@
     <div class="login-wrapper">
       <div class="login-content">
         <div class="register">
-          <img
-            src="../../assets/images/logo-01.png"
-            alt="Vevue"
-            class="login-logo"
-          />
+          <img src="../../assets/images/logo-01.png" alt="Vevue" class="login-logo" />
           <div class="login-button connecting" v-if="isConnecting">
             Connecting...
           </div>
@@ -24,7 +20,7 @@
 import axios from "axios";
 import Web3 from "web3";
 import apiUrl from "../../assets/js/config/urlConfig.js";
-import docCookies from '../../static/tools/cookies'
+import docCookies from "../../static/tools/cookies";
 export default {
   data() {
     let result = {
@@ -44,6 +40,10 @@ export default {
   },
   methods: {
     async connectWithMetamask() {
+      if (!window.ethereum) {
+        this.$message.error('NOT_INSTALLED : Metamask Wallet')
+        return;
+      }
       try {
         this.isConnecting = true;
         await window.ethereum.request({ method: "eth_requestAccounts" });
@@ -86,18 +86,10 @@ export default {
               });
               let userinfo = res.data.data.userinfo;
               Object.keys(userinfo).map((key, value) => {
-                docCookies.setItem(
-                  key,
-                  userinfo[key] || "",
-                  this.cookiesEnd,
-                  "/",
-                  null
-                );
+                docCookies.setItem(key, userinfo[key] || "", this.cookiesEnd, "/", null);
               });
               if (this.GetQueryString("continue")) {
-                location.href = decodeURIComponent(
-                  this.GetQueryString("continue")
-                );
+                location.href = decodeURIComponent(this.GetQueryString("continue"));
                 return;
               }
               this.loginSuccessDefault(); // 执行成功回调

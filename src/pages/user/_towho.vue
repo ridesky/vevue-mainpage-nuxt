@@ -1,122 +1,190 @@
 <template>
-    <div class="user-page-wrapper">
-        <no-ssr>
-            <div class="top-user-container">
-                <div class="user-meta-info">
-                    <div class="user-image-container" v-show="userInfo.avatar">
-                        <img :src="userInfo.avatar" alt="" :onerror='logo'>
-                    </div>
-                    <div class="user-text-info">
-                        <p class="nick-meta">
-                            <span class="nickname">{{userInfo.nickname}}</span>
-                            <i v-show="userInfo.authorsign" class="iconfont icon-authorsign"></i>
-                            <span v-show="userInfo.authorsign">{{userInfo.authorsign}}</span>
-                        </p>
-                        <p class="uid" v-show="userInfo.uid">UID {{userInfo.uid}}</p>
-                        <p class="signature">{{userInfo.signature}}</p>
-                        <div v-if="userid === towho" class="vevue_score" v-show="userInfo.transactionList">
-                            <img @click="showTransactionList = true" src="../../assets/images/logo_coin_100.png" alt="score">
-                            <div @click="showTransactionList = true" class="token_left">{{userInfo.amount}}</div>
-                            <el-button type="danger" style="background:#EE2A69;color:#fff" class="plain deposit" size='mini' @click="showQRCode">Deposit</el-button>
-                            <el-dialog width='25%' title="Score" :visible.sync='showTransactionList' class="transaction_dialog">
-                                <div v-for="item in userInfo.transactionList" :key='item.id' class="transactionList">
-                                    <div class="item_show">
-                                        <div class="item_type">
-                                            {{transactionConfig[item.type]? transactionConfig[item.type]['enWord'] : item.type}}
-                                        </div>
-                                        <div v-if="transactionConfig[item.type]" class="item_amount" :style="'color:'+transactionConfig[item.type]['color']">
-                                            {{transactionConfig[item.type]?transactionConfig[item.type]['symbol'] : '' }}{{item.amount}}
-                                        </div>
-                                        <div v-else>
-                                            {{item.amount}}
-                                        </div>
-                                        <div class="item_date">
-                                            {{jsFormat.smartTime(new Date(item.date *1000))}}
-                                        </div>
-                                    </div>
-                                    <div class="item_id">
-                                        ID: {{item.id}}
-                                    </div>
-                                </div>
-                            </el-dialog>
-                            <el-dialog :visible.sync='showAddrQRCode' width='30%' class="qrcode_dialog">
-                                <div id="qrcode"></div>
-                                <h3 class="addr_text">{{userInfo.addr_vevue}}</h3>
-                                <div @click="clipText('.addr_btn')" class="addr_btn" :aria-label='userInfo.addr_vevue'>Copy Address</div>
-                                <div class="deposit_info">*VEVUE address only accepts VEVUE deposit. Any other assets deposited to VEVUE address will be irretrievable</div>
-                            </el-dialog>
-                        </div>
-                        <div v-else>
-                            <p> {{userInfo.followers}} Followers {{userInfo.following}} Following</p>
-                            <div class="followed toFollow" v-show="!userInfo.hasfollowed" @click="toFollow(true,0)">Follow</div>
-                            <div class="followed toUnfollow" v-show="userInfo.hasfollowed" @click="toFollow(false,0)">UnFollow</div>
-                        </div>
-                    </div>
-                    <div class="subscribe">
+  <div class="user-page-wrapper">
+    <no-ssr>
+      <div class="top-user-container">
+        <div class="user-meta-info">
+          <div class="user-image-container" v-show="userInfo.avatar">
+            <img :src="userInfo.avatar" alt="" :onerror="logo" />
+          </div>
+          <div class="user-text-info">
+            <p class="nick-meta">
+              <span class="nickname">{{ userInfo.nickname }}</span>
+              <i v-show="userInfo.authorsign" class="iconfont icon-authorsign"></i>
+              <span v-show="userInfo.authorsign">{{ userInfo.authorsign }}</span>
+            </p>
+            <p class="uid" v-show="userInfo.uid">UID {{ userInfo.uid }}</p>
+            <p class="signature">{{ userInfo.signature }}</p>
 
+            <div v-if="userid === towho" class="vevue_score" v-show="userInfo.transactionList">
+              <img src="../../assets/images/logo_coin_100.png" alt="score" />
+              <div class="token_left">
+                {{ userInfo.amount }}
+              </div>
+              <el-dialog width="25%" title="Score" :visible.sync="showTransactionList" class="transaction_dialog">
+                <div v-for="item in userInfo.transactionList" :key="item.id" class="transactionList">
+                  <div class="item_show">
+                    <div class="item_type">
+                      {{ transactionConfig[item.type] ? transactionConfig[item.type]["enWord"] : item.type }}
                     </div>
+                    <div
+                      v-if="transactionConfig[item.type]"
+                      class="item_amount"
+                      :style="'color:' + transactionConfig[item.type]['color']"
+                    >
+                      {{ transactionConfig[item.type] ? transactionConfig[item.type]["symbol"] : "" }}{{ item.amount }}
+                    </div>
+                    <div v-else>
+                      {{ item.amount }}
+                    </div>
+                    <div class="item_date">
+                      {{ jsFormat.smartTime(new Date(item.date * 1000)) }}
+                    </div>
+                  </div>
+                  <div class="item_id">ID: {{ item.id }}</div>
                 </div>
+              </el-dialog>
+              <el-button type="danger" class="plain deposit" size="mini" @click="showDeposit">Deposit</el-button>
+              <el-dialog :visible.sync="showDepositDialog" title="Deposit" width="30%" class="transfer_dialog">
+                <div class="transfer-content">
+                  <!-- <el-input class="addr_text" disabled v-model="userInfo.metamask"></el-input> -->
+                  <h3 class="addr_text">Pay Matic in exchange for Vpay</h3>
+                  <el-input class="addr_input" type="number" v-model="transferAmount"> </el-input>
+                  <el-button
+                    class="transfer-button deposit-button"
+                    type="danger"
+                    :loading="isTransferring"
+                    @click="toDeposit"
+                    >Send Matic
+                  </el-button>
+                  <div class="deposit_info">
+                    Transfer your token.
+                  </div>
+                </div>
+              </el-dialog>
             </div>
-        </no-ssr>
-        <no-ssr>
-            <div class="tab-container">
-                <el-menu :default-active="activeIndex" class="el-menu-demo tab-select" mode="horizontal">
-                    <router-link :to="'/user/' +towho +'/works'" active-class="bottom-color">
-                        <el-menu-item :index="'/user/' +towho +'/works'">{{userInfo.vevue}}<br/> WORKS </el-menu-item>
-                    </router-link>
-                    <router-link :to="'/user/' +towho+'/respond'" active-class="bottom-color">
-                        <el-menu-item :index="'/user/' +towho+'/respond'">{{userInfo.respond}} <br/> RESPOND</el-menu-item>
-                    </router-link>
-                    <router-link :to="'/user/' +towho+'/likes'" active-class="bottom-color">
-                        <el-menu-item :index="'/user/' +towho+'/likes'">{{userInfo.likes}} <br/> LIKES</el-menu-item>
-                    </router-link>
-                    <router-link :to="'/user/' +towho +'/followers'" active-class="bottom-color">
-                        <el-menu-item :index="'/user/' +towho+'/followers'">{{userInfo.followers}} <br/> FOLLOWERS</el-menu-item>
-                    </router-link>
-                    <router-link :to="'/user/' +towho +'/following'" active-class="bottom-color">
-                        <el-menu-item :index="'/user/' +towho+'/following'">{{userInfo.following}} <br/> FOLLOWING</el-menu-item>
-                    </router-link>
-                </el-menu>
+            <div v-else class="interact">
+              <!-- <p> {{userInfo.followers}} Followers {{userInfo.following}} Following</p> -->
+              <div class="followed toFollow" v-show="!userInfo.hasfollowed" @click="toFollow(true, 0)">
+                Follow
+              </div>
+              <div class="followed toUnfollow" v-show="userInfo.hasfollowed" @click="toFollow(false, 0)">
+                UnFollow
+              </div>
+              <el-button class="plain deposit reward" size="mini" type="warning" @click="showReward" v-if="userInfo.metamask">Reward</el-button>
+              <el-dialog
+                :visible.sync="showRewardDialog"
+                :title="'Reward for ' + userInfo.nickname || '' "
+                width="30%"
+                class="transfer_dialog"
+              >
+                <div class="transfer-content">
+                  <el-input class="addr_text" disabled v-model="userInfo.metamask"></el-input>
+                  <el-input class="addr_input" type="number" v-model="transferAmount"> </el-input>
+                  <el-button
+                    class="transfer-button reward-button"
+                    type="warning"
+                    :loading="isTransferring"
+                    @click="toReward('Vpay')"
+                    >Reward Vpay
+                  </el-button>
+                  <div class="deposit_info">
+                    Transfer your token.
+                  </div>
+                </div>
+              </el-dialog>
             </div>
-        </no-ssr>
-        <no-ssr>
-            <div>
-                <keep-alive>
-                    <video-list :listenScroll='true' :params="params['works']" v-if="type === 'works' || type === ''"></video-list>
-                </keep-alive>
-                <keep-alive>
-                    <video-list :listenScroll='true' :params="params['respond']" v-if="type === 'respond'"></video-list>
-                </keep-alive>
-                <keep-alive>
-                    <video-list :listenScroll='true' :params="params['likes']" v-if="type === 'likes'"></video-list>
-                </keep-alive>
-                <keep-alive>
-                    <follow-content :listenScroll='true' :params="params['followers']" v-if="type ==='followers'"></follow-content>
-                </keep-alive>
-                <keep-alive>
-                    <follow-content :listenScroll='true' :params="params['following']" v-if="type ==='following'"></follow-content>
-                </keep-alive>
-            </div>
-        </no-ssr>
-        <!-- <nuxt-child></nuxt-child> -->
-    </div>
+          </div>
+          <div class="subscribe"></div>
+        </div>
+      </div>
+    </no-ssr>
+    <no-ssr>
+      <div class="tab-container">
+        <el-menu :default-active="activeIndex" class="el-menu-demo tab-select" mode="horizontal">
+          <router-link :to="'/user/' + towho + '/works'" active-class="bottom-color">
+            <el-menu-item :index="'/user/' + towho + '/works'"
+              >{{ userInfo.vevue }}<br />
+              WORKS
+            </el-menu-item>
+          </router-link>
+          <router-link :to="'/user/' + towho + '/respond'" active-class="bottom-color">
+            <el-menu-item :index="'/user/' + towho + '/respond'"
+              >{{ userInfo.respond }} <br />
+              RESPOND</el-menu-item
+            >
+          </router-link>
+          <router-link :to="'/user/' + towho + '/likes'" active-class="bottom-color">
+            <el-menu-item :index="'/user/' + towho + '/likes'"
+              >{{ userInfo.likes }} <br />
+              LIKES</el-menu-item
+            >
+          </router-link>
+          <router-link :to="'/user/' + towho + '/followers'" active-class="bottom-color">
+            <el-menu-item :index="'/user/' + towho + '/followers'"
+              >{{ userInfo.followers }} <br />
+              FOLLOWERS</el-menu-item
+            >
+          </router-link>
+          <router-link :to="'/user/' + towho + '/following'" active-class="bottom-color">
+            <el-menu-item :index="'/user/' + towho + '/following'"
+              >{{ userInfo.following }} <br />
+              FOLLOWING</el-menu-item
+            >
+          </router-link>
+        </el-menu>
+      </div>
+    </no-ssr>
+    <no-ssr>
+      <div>
+        <keep-alive>
+          <video-list
+            :listenScroll="true"
+            :params="params['works']"
+            v-if="type === 'works' || type === ''"
+          ></video-list>
+        </keep-alive>
+        <keep-alive>
+          <video-list :listenScroll="true" :params="params['respond']" v-if="type === 'respond'"></video-list>
+        </keep-alive>
+        <keep-alive>
+          <video-list :listenScroll="true" :params="params['likes']" v-if="type === 'likes'"></video-list>
+        </keep-alive>
+        <keep-alive>
+          <follow-content
+            :listenScroll="true"
+            :params="params['followers']"
+            v-if="type === 'followers'"
+          ></follow-content>
+        </keep-alive>
+        <keep-alive>
+          <follow-content
+            :listenScroll="true"
+            :params="params['following']"
+            v-if="type === 'following'"
+          ></follow-content>
+        </keep-alive>
+      </div>
+    </no-ssr>
+    <!-- <nuxt-child></nuxt-child> -->
+  </div>
 </template>
 <script>
-import axios from 'axios';
-import videoList from '../../components/videoList.vue';
-import followContent from '../../components/followerContent.vue';
-import apiUrl from '../../assets/js/config/urlConfig.js';
-import jsFormat from '../../static/tools/jsFormat.js';
-import docCookies from '../../static/tools/cookies.js';
-import totp from '../../static/tools/totp.js';
-import transactionConfig from '../../assets/js/config/transactionConfig.js';
-import ClipboardJS from 'clipboard';
+import axios from "axios";
+import videoList from "../../components/videoList.vue";
+import followContent from "../../components/followerContent.vue";
+import apiUrl from "../../assets/js/config/urlConfig.js";
+import jsFormat from "../../static/tools/jsFormat.js";
+import docCookies from "../../static/tools/cookies.js";
+import totp from "../../static/tools/totp.js";
+import transactionConfig from "../../assets/js/config/transactionConfig.js";
+import ClipboardJS from "clipboard";
+import { decimalToInteger } from "../../static/tools/convertors.js";
 if (process.browser) {
-  require('../../static/tools/qrcode.min.js');
+  // require("../../static/tools/qrcode.min.js");
 }
 let globalUserInfoCache = {};
 export default {
-  layout: 'headNavigation',
+  layout: "headNavigation",
   components: {
     videoList,
     followContent
@@ -124,77 +192,74 @@ export default {
   data() {
     const that = this;
     let result = {
-      params: '',
-      type: '',
+      params: "",
+      type: "",
       jsFormat,
       transactionConfig,
       showTransactionList: false, // 交易列表 dialog 开关
-      showAddrQRCode: false, // 地址二维码 dialog 开关
+      showDepositDialog: false, // 地址二维码 dialog 开关
+      showRewardDialog: false,
       maxRequestTimes: 5,
-      hashUrl: '',
-      paramsSelect: '',
+      hashUrl: "",
+      paramsSelect: "",
       towho: this.$route.params.towho,
       type: this.$route.params.type,
       activeIndex:
-        '/user/' +
-        this.$router.history.current.params.towho +
-        '/' +
-        this.$router.history.current.params.type,
+        "/user/" + this.$router.history.current.params.towho + "/" + this.$router.history.current.params.type,
       userInfo: globalUserInfoCache,
-      logo:
-        'this.src="' +
-        require('../../assets/images/vevue_logo_50x50.png') +
-        '"',
+      transferAmount: 10, // amount to transfer or reward
+      isTransferring: false,
+      logo: 'this.src="' + require("../../assets/images/vevue_logo_50x50.png") + '"',
       cookiesEnd: 604800, // cookies时间
-      userid: '',
+      userid: "",
       old: {
-        towho: ''
+        towho: ""
       }
     };
     if (process.client) {
       Object.assign(result, {
         params: {
           works: {
-            action: 'listoftype',
-            userid: docCookies.getItem('userid') || '-',
+            action: "listoftype",
+            userid: docCookies.getItem("userid") || "-",
             towho: that.$router.history.current.params.towho,
-            type: 'vevue',
-            cid: docCookies.getItem('cid') || ''
+            type: "vevue",
+            cid: docCookies.getItem("cid") || ""
           },
           respond: {
-            action: 'listoftype',
-            userid: docCookies.getItem('userid') || '-',
+            action: "listoftype",
+            userid: docCookies.getItem("userid") || "-",
             towho: that.$router.history.current.params.towho,
-            type: 'respond',
-            cid: docCookies.getItem('cid') || ''
+            type: "respond",
+            cid: docCookies.getItem("cid") || ""
           },
           topics: {
-            action: 'listoftype',
-            userid: docCookies.getItem('userid') || '-',
+            action: "listoftype",
+            userid: docCookies.getItem("userid") || "-",
             towho: that.$router.history.current.params.towho,
-            type: 'topics',
-            cid: docCookies.getItem('cid') || ''
+            type: "topics",
+            cid: docCookies.getItem("cid") || ""
           },
           likes: {
-            action: 'listoftype',
-            userid: docCookies.getItem('userid') || '-',
+            action: "listoftype",
+            userid: docCookies.getItem("userid") || "-",
             towho: that.$router.history.current.params.towho,
-            type: 'likes',
-            cid: docCookies.getItem('cid') || ''
+            type: "likes",
+            cid: docCookies.getItem("cid") || ""
           },
           following: {
-            action: 'listoffollow',
-            userid: docCookies.getItem('userid') || '-',
+            action: "listoffollow",
+            userid: docCookies.getItem("userid") || "-",
             towho: that.$router.history.current.params.towho,
-            type: 'following',
-            cid: docCookies.getItem('cid') || ''
+            type: "following",
+            cid: docCookies.getItem("cid") || ""
           },
           followers: {
-            action: 'listoffans',
-            userid: docCookies.getItem('userid') || '-',
+            action: "listoffans",
+            userid: docCookies.getItem("userid") || "-",
             towho: that.$router.history.current.params.towho,
-            type: 'followers',
-            cid: docCookies.getItem('cid') || ''
+            type: "followers",
+            cid: docCookies.getItem("cid") || ""
           }
         },
         type: this.$router.history.current.params.type
@@ -204,41 +269,134 @@ export default {
   },
   mounted() {
     if (process.client) {
-      this.userid = docCookies.getItem('userid') || '';
-      this.hashUrl = encodeURIComponent('/' + window.location.hash);
+      this.userid = docCookies.getItem("userid") || "";
+      this.hashUrl = encodeURIComponent("/" + window.location.hash);
       document.documentElement.scrollTop = 0;
       this.getUserInfo(0);
     }
   },
   methods: {
     clipText(el) {
-      console.log('clip');
+      console.log("clip");
       const clip = new ClipboardJS(el, {
         text: function(trigger) {
-          return trigger.getAttribute('aria-label');
+          return trigger.getAttribute("aria-label");
         }
       });
-      clip.on('success', e => {
+      clip.on("success", e => {
         this.$message({
-          message: 'Link Copied',
+          message: "Link Copied",
           duration: 1200,
-          type: 'success'
+          type: "success"
         });
-        console.log('success');
+        console.log("success");
         console.log(e);
         clip.destroy();
       });
     },
-    showQRCode() {
-      this.showAddrQRCode = true;
-      // this.qrcode.clear();
-      this.$nextTick(() => {
-        if (!this.qrcode) {
-          this.qrcode = new QRCode(document.getElementById('qrcode'), {
-            text: this.userInfo.addr_vevue
+    showDeposit() {
+      this.showDepositDialog = true;
+    },
+    async toDeposit() {
+      if (this.transferAmount < 10) {
+        this.$message.error("The paid Matic is at least 10");
+        return;
+      }
+      try {
+        this.isTransferring = true;
+        const txInfo = await this.$sendTransaction({ amount: this.transferAmount });
+        if (txInfo.transactionHash) {
+          const transferInfo = await axios.post(apiUrl.checkTransfer, {
+            txid: txInfo.transactionHash,
+            addr_transfer_to: this.userInfo.metamask,
+            amount: decimalToInteger(this.transferAmount, 18)
           });
+          console.log("transferInfo is");
+          console.log(transferInfo);
+          if (transferInfo.data.errcode === 0 && transferInfo.data.data.result === true) {
+            this.$alert(
+              `<p>Transaction hash: <strong style="overflow-wrap:break-word">${txInfo.transactionHash}</strong></p>`,
+              "Deposit Success",
+              {
+                confirmButtonText: "Close",
+                dangerouslyUseHTMLString: true,
+                type: "success"
+              }
+            );
+          } else {
+            this.$alert(
+              `<p>Please check transaction hash: <strong style="overflow-wrap:break-word">${txInfo.transactionHash}</strong></p>`,
+              "Deposit Failed",
+              {
+                confirmButtonText: "Close",
+                dangerouslyUseHTMLString: true,
+                type: "error"
+              }
+            );
+          }
+          this.isTransferring = false;
         }
-      });
+      } catch (error) {
+        console.log("error!");
+        console.error(error);
+        this.$alert(`Transfer Failed: ${error.toString()}`, "", {
+          confirmButtonText: "Close",
+          dangerouslyUseHTMLString: true,
+          type: "error"
+        });
+        this.isTransferring = false;
+      }
+    },
+    showReward() {
+      this.showRewardDialog = true;
+    },
+    async toReward(token) {
+      try {
+        this.isTransferring = true;
+        const txInfo = await this.$transferErc20Token(this.userInfo.metamask, this.transferAmount, token);
+        console.log(txInfo);
+        if (txInfo.transactionHash) {
+          const transferInfo = await axios.post(apiUrl.checkTransfer, {
+            txid: txInfo.transactionHash,
+            addr_transfer_to: this.userInfo.metamask,
+            amount: decimalToInteger(this.transferAmount, 18)
+          });
+          console.log("transferInfo is");
+          console.log(transferInfo);
+          if (transferInfo.data.errcode === 0 && transferInfo.data.data.result === true) {
+            this.$alert(
+              `<p>Transaction hash: <strong style="overflow-wrap:break-word">${txInfo.transactionHash}</strong></p>`,
+              "Reward Success",
+              {
+                confirmButtonText: "Close",
+                dangerouslyUseHTMLString: true,
+                type: "success"
+              }
+            );
+          } else {
+            this.$alert(
+              `<p>Please check transaction hash: <strong style="overflow-wrap:break-word">${txInfo.transactionHash}</strong></p>`,
+              "Reward Failed",
+              {
+                confirmButtonText: "Close",
+                dangerouslyUseHTMLString: true,
+                type: "error"
+              }
+            );
+          }
+          this.isTransferring = false;
+        }
+      } catch (error) {
+        this.$alert(`Transfer Failed: ${error.toString()}`, "", {
+          confirmButtonText: "Close",
+          dangerouslyUseHTMLString: true,
+          type: "error"
+        });
+        this.isTransferring = false;
+      }
+    },
+    async checkTransfer(txid, addr_transfer_to, amount) {
+      return await axios.post(apiUrl.checkTransfer, { txid, addr_transfer_to, addr_transfer_to });
     },
     getUserInfo(times) {
       const that = this;
@@ -246,14 +404,12 @@ export default {
         return;
       }
       axios
-        .post(apiUrl.vevueAPI + 'visitor', {
-          userid: docCookies.getItem('userid') || '-',
+        .post(apiUrl.vevueAPI + "visitor", {
+          userid: docCookies.getItem("userid") || "-",
           towho: that.towho,
           date: new Date().getTime(),
-          authcode: docCookies.getItem('userid')
-            ? totp.getCode(docCookies.getItem('safekey'))
-            : '',
-          cid: docCookies.getItem('cid') || '',
+          authcode: docCookies.getItem("userid") ? totp.getCode(docCookies.getItem("safekey")) : "",
+          cid: docCookies.getItem("cid") || "",
           timestamp: Math.floor(new Date().getTime() / 1000)
         })
         .then(async res => {
@@ -261,24 +417,16 @@ export default {
             let result = JSON.parse(JSON.stringify(res.data.result));
             result.nickname = result.nickname;
             result.signature = result.signature;
-            result.avatar = apiUrl.avatarURL + res.data.result.avatar + '.jpg';
-            result.cover = apiUrl.avatarURL + res.data.result.cover + '.jpg';
-            if (that.towho === docCookies.getItem('userid')) {
-              docCookies.setItem(
-                'avatar',
-                res.data.result.avatar,
-                this.cookiesEnd,
-                '/',
-                null
-              );
-              let balance = await axios.post(apiUrl.vevueAPI + 'balance', {
-                userid: docCookies.getItem('userid'),
+            result.avatar = apiUrl.avatarURL + res.data.result.avatar + ".jpg";
+            result.cover = apiUrl.avatarURL + res.data.result.cover + ".jpg";
+            if (that.towho === docCookies.getItem("userid")) {
+              docCookies.setItem("avatar", res.data.result.avatar, this.cookiesEnd, "/", null);
+              let balance = await axios.post(apiUrl.vevueAPI + "balance", {
+                userid: docCookies.getItem("userid"),
                 simple: 0,
                 version: 0.1,
-                authcode: docCookies.getItem('userid')
-                  ? totp.getCode(docCookies.getItem('safekey'))
-                  : '',
-                cid: docCookies.getItem('cid') || '',
+                authcode: docCookies.getItem("userid") ? totp.getCode(docCookies.getItem("safekey")) : "",
+                cid: docCookies.getItem("cid") || "",
                 timestamp: Math.floor(new Date().getTime() / 1000)
               });
               if (balance.data.errcode === 0) {
@@ -304,17 +452,17 @@ export default {
         return;
       }
       if (!this.userid.trim()) {
-        window.location.href = '/login?continue=' + this.hashUrl;
+        window.location.href = "/login?continue=" + this.hashUrl;
         return;
       }
       this.userInfo.hasfollowed = !this.userInfo.hasfollowed;
       axios
-        .post(apiUrl.vevueAPI + 'follow', {
-          userid: docCookies.getItem('userid'),
+        .post(apiUrl.vevueAPI + "follow", {
+          userid: docCookies.getItem("userid"),
           towho: that.towho,
           sign: bool,
-          cid: docCookies.getItem('cid'),
-          authcode: totp.getCode(docCookies.getItem('safekey')),
+          cid: docCookies.getItem("cid"),
+          authcode: totp.getCode(docCookies.getItem("safekey")),
           timestamp: Math.floor(new Date().getTime() / 1000)
         })
         .then(res => {
@@ -333,24 +481,24 @@ export default {
     }
   },
   beforeRouteUpdate(to, from, next) {
-    console.log('route update');
+    console.log("route update");
     if (!to.params.type) {
-      console.log('跳转');
+      console.log("跳转");
       console.log(to.params.towho);
       //   next(vm => {
       //     vm.$router.push('/user/' + to.params.towho + '/works');
       //   });
-      location.href = '/user/' + to.params.towho + '/works';
+      location.href = "/user/" + to.params.towho + "/works";
     } else {
       this.type = to.params.type;
       next();
     }
   },
   beforeRouteEnter(to, from, next) {
-    console.log('router enter');
+    console.log("router enter");
     if (!to.params.type) {
       next(vm => {
-        vm.$router.push('/user/' + to.params.towho + '/works');
+        vm.$router.push("/user/" + to.params.towho + "/works");
       });
     } else {
       next();
@@ -358,7 +506,7 @@ export default {
   }
 };
 </script>
-<style lang='stylus'>
+<style lang="stylus">
 body {
     padding: 0px !important;
 }
@@ -469,6 +617,27 @@ body {
             font-weight: normal;
             font-size: 13px;
         }
+        .interact{
+          display: flex;
+          .plain{
+            // &.reward{
+            //   border-color:#eacd76
+            //   background:#eacd76
+            //   color:#fff;
+            // }
+            display:flex;
+            align-items:center;
+            font-size:14px;
+            height: 25px;
+            margin-left: 5px;
+          }
+          .el-dialog__body {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center !important;
+    }
+        }
     }
 
     .user-image-container {
@@ -510,16 +679,31 @@ body {
         justify-content: center !important;
     }
 
-    #qrcode {
+}
+#qrcode {
         display: flex;
         justify-content: center;
         align-items: center;
     }
+    .transfer-content{
+      text-align:center;
+      padding: 10px;
+      width: 80%;
+      .transfer-button{
+        margin-top: 10px;
+        width:100%;
+        .deposit-button{
 
-    .addr_text {
-        margin-top: 20px;
+        }
+        .reward-button{}
+      }
     }
-
+    .addr_text {
+        margin: 0px auto 20px;
+    }
+    .addr_input{
+      width: 100%;
+    }
     .addr_btn {
         color: #409EFF;
         cursor: pointer;
@@ -530,7 +714,6 @@ body {
         color: #E4A611;
         font-size: 12px;
     }
-}
 
 .followed {
     display: flex;

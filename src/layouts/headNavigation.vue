@@ -294,7 +294,7 @@ export default {
     return {
       script: [
         {
-          src: "//vjs.zencdn.net/7.0/video.min.js"
+          src: "//cdn.jsdelivr.net/npm/video.js@7.0.5/dist/video.min.js"
         },
         {
           src: "//cdn.jsdelivr.net/npm/danmaku@1.3.5/dist/danmaku.js"

@@ -2,7 +2,8 @@
   <div class="test-wrapper">
     <el-input placeholder="receiver" v-model="receiver"></el-input>
     <el-input-number v-model="amount"></el-input-number>
-    <el-button @click="toTransfer">Transfer</el-button>
+    <el-button @click="toTransfer('Vpay')">Transfer</el-button>
+    <el-button @click="toSendTransaction('matic')">sendTransaction</el-button>
   </div>
 </template>
 <script>
@@ -18,8 +19,14 @@ export default {
     };
   },
   methods: {
-    toTransfer(receiver, amount) {
-      this.$transferToken(this.receiver, this.amount).then(res => {
+    toTransfer(token) {
+      this.$transferErc20Token(this.receiver, this.amount, token).then(res => {
+        console.log("transfer finall is");
+        console.log(res);
+      });
+    },
+    toSendTransaction(token) {
+      this.$sendTransaction({ to: this.receiver, amount: this.amount }).then(res => {
         console.log("transfer finall is");
         console.log(res);
       });

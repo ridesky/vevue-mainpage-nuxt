@@ -541,11 +541,11 @@ export default {
     },
     successFile(e, fileList) {
       let size = e.size;
-      if (size > 819200000 || size < 1024000) {
+      if (size > 2048000000 || size < 5120000) {
         this.$refs.uploadVideo.clearFiles();
         this.$refs.reUploadVideo.clearFiles();
         this.$message({
-          message: 'Video size is limited to 1M-800M',
+          message: 'Video size is limited to 5M-2G',
           type: 'error'
         });
         return;

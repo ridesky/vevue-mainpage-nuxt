@@ -201,11 +201,9 @@ import totp from '../../static/tools/totp.js';
 // if (process.client) {
 //   require('videojs-vr');
 // }
-// import '../../static/tools/video.min.7.2.0.js';
-// import '../../static/tools/danmaku.1.3.5';
 if (process.client) {
   // danmakujs();
-  // require('../../static/tools/video.min.7.2.0.js');
+
 }
 let globalCache = null;
 export default {
