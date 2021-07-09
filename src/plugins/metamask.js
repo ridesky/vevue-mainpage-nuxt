@@ -7,11 +7,11 @@ const CHAIN_ID_MUMBAI = 80001;
 const tokenHash = {
   [CHAIN_ID_MATIC]: {
     Vpay: "0x60Cc8B28098721BAEB33979d43268a999918e9D1",
-    deposit: ""
+    deposit: "0x615F0853B746B4cF44344d0A79e5ab58D2376752"
   },
   [CHAIN_ID_MUMBAI]: {
     Vpay: "0x04138CD5ba39a8911838d0f7A71eB46C18a76846",
-    deposit: "0x615F0853B746B4cF44344d0A79e5ab58D2376752" // to do 更换真正的兑换地址
+    deposit: "0x615F0853B746B4cF44344d0A79e5ab58D2376752" // 兑换Vpay地址
   }
 };
 const connectWithMetamask = async () => {
