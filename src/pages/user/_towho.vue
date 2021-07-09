@@ -47,17 +47,18 @@
               <el-dialog :visible.sync="showDepositDialog" title="Deposit" width="30%" class="transfer_dialog">
                 <div class="transfer-content">
                   <!-- <el-input class="addr_text" disabled v-model="userInfo.metamask"></el-input> -->
-                  <h3 class="addr_text">Pay Matic in exchange for Vpay</h3>
-                  <el-input class="addr_input" type="number" v-model="transferAmount"> </el-input>
+                  <h3 class="addr_text">Swap Matic to Vpay (1:100)</h3>
+                  <el-slider class="addr_input" :min="1" v-model="transferAmount" :marks="transferMark"></el-slider>
+                  <!-- <el-input class="addr_input" type="number" v-model="transferAmount"> </el-input> -->
                   <el-button
                     class="transfer-button deposit-button"
                     type="danger"
                     :loading="isTransferring"
                     @click="toDeposit"
-                    >Send Matic
+                    >Send {{transferAmount}} Matic
                   </el-button>
                   <div class="deposit_info">
-                    Transfer your token.
+                    <!-- Transfer your token. -->
                   </div>
                 </div>
               </el-dialog>
@@ -70,25 +71,33 @@
               <div class="followed toUnfollow" v-show="userInfo.hasfollowed" @click="toFollow(false, 0)">
                 UnFollow
               </div>
-              <el-button class="plain deposit reward" size="mini" type="warning" @click="showReward" v-if="userInfo.metamask">Reward</el-button>
+              <el-button
+                class="plain deposit reward"
+                size="mini"
+                type="warning"
+                @click="showReward"
+                :disabled="!userInfo.metamask"
+                >Reward</el-button
+              >
               <el-dialog
                 :visible.sync="showRewardDialog"
-                :title="'Reward for ' + userInfo.nickname || '' "
+                :title="'Reward for ' + userInfo.nickname || ''"
                 width="30%"
                 class="transfer_dialog"
               >
                 <div class="transfer-content">
                   <el-input class="addr_text" disabled v-model="userInfo.metamask"></el-input>
-                  <el-input class="addr_input" type="number" v-model="transferAmount"> </el-input>
+                  <el-slider class="addr_input" :min="1"  v-model="transferAmount" :marks="transferMark"></el-slider>
+                  <!-- <el-input class="addr_input" type="number" v-model="transferAmount"> </el-input> -->
                   <el-button
                     class="transfer-button reward-button"
                     type="warning"
                     :loading="isTransferring"
                     @click="toReward('Vpay')"
-                    >Reward Vpay
+                    >Reward {{transferAmount}} Vpay
                   </el-button>
                   <div class="deposit_info">
-                    Transfer your token.
+                    <!-- Transfer your token. -->
                   </div>
                 </div>
               </el-dialog>
@@ -207,7 +216,14 @@ export default {
       activeIndex:
         "/user/" + this.$router.history.current.params.towho + "/" + this.$router.history.current.params.type,
       userInfo: globalUserInfoCache,
-      transferAmount: 10, // amount to transfer or reward
+      transferAmount: 1, // amount to transfer or reward
+      transferMark: {
+        1: "1",
+        25: "25",
+        50: "50",
+        75: "75",
+        100: "100"
+      },
       isTransferring: false,
       logo: 'this.src="' + require("../../assets/images/vevue_logo_50x50.png") + '"',
       cookiesEnd: 604800, // cookies时间
@@ -298,17 +314,17 @@ export default {
       this.showDepositDialog = true;
     },
     async toDeposit() {
-      if (this.transferAmount < 10) {
-        this.$message.error("The paid Matic is at least 10");
-        return;
-      }
+      // if (this.transferAmount < 1) {
+      //   this.$message.error("The paid Matic is at least 1");
+      //   return;
+      // }
       try {
         this.isTransferring = true;
         const txInfo = await this.$sendTransaction({ amount: this.transferAmount });
         if (txInfo.transactionHash) {
           const transferInfo = await axios.post(apiUrl.checkTransfer, {
             txid: txInfo.transactionHash,
-            addr_transfer_to: this.userInfo.metamask,
+            addr_transfer_to: apiUrl.ADDRESS_TO_REDEEM_VPAY,
             amount: decimalToInteger(this.transferAmount, 18)
           });
           console.log("transferInfo is");
@@ -339,7 +355,7 @@ export default {
       } catch (error) {
         console.log("error!");
         console.error(error);
-        this.$alert(`Transfer Failed: ${error.toString()}`, "", {
+        this.$alert(`Transfer Failed: ${error.message || error.toString()}`, "", {
           confirmButtonText: "Close",
           dangerouslyUseHTMLString: true,
           type: "error"
@@ -387,7 +403,7 @@ export default {
           this.isTransferring = false;
         }
       } catch (error) {
-        this.$alert(`Transfer Failed: ${error.toString()}`, "", {
+        this.$alert(`Transfer Failed: ${error.message || error.toString()}`, "", {
           confirmButtonText: "Close",
           dangerouslyUseHTMLString: true,
           type: "error"
@@ -702,7 +718,12 @@ body {
         margin: 0px auto 20px;
     }
     .addr_input{
-      width: 100%;
+      width: 90%;
+      margin: 0 auto 10px;
+      word-break: normal;
+      .el-slider__stop{
+        border: solid 0.5px #409EFF;
+      }
     }
     .addr_btn {
         color: #409EFF;

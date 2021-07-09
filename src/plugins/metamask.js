@@ -2,16 +2,15 @@ import Vue from "vue";
 import Web3 from "web3";
 import BigNumber from "bignumber.js";
 import { integerToDecimal, decimalToInteger } from "../static/tools/convertors";
+import { ADDRESS_TO_REDEEM_VPAY } from "../assets/js/config/urlConfig";
 const CHAIN_ID_MATIC = 137;
 const CHAIN_ID_MUMBAI = 80001;
 const tokenHash = {
   [CHAIN_ID_MATIC]: {
-    Vpay: "0x60Cc8B28098721BAEB33979d43268a999918e9D1",
-    deposit: "0x615F0853B746B4cF44344d0A79e5ab58D2376752"
+    Vpay: "0x60Cc8B28098721BAEB33979d43268a999918e9D1"
   },
   [CHAIN_ID_MUMBAI]: {
-    Vpay: "0x04138CD5ba39a8911838d0f7A71eB46C18a76846",
-    deposit: "0x615F0853B746B4cF44344d0A79e5ab58D2376752" // 兑换Vpay地址
+    Vpay: "0x04138CD5ba39a8911838d0f7A71eB46C18a76846"
   }
 };
 const connectWithMetamask = async () => {
@@ -45,8 +44,7 @@ const methods = {
     };
     Vue.prototype.$sendTransaction = async function({ to, amount, decimals = 18 }) {
       const vevueWeb3 = new Web3(window.ethereum);
-      const chainId = await vevueWeb3.eth.getChainId();
-      to = to || tokenHash[chainId]["deposit"];
+      to = to || ADDRESS_TO_REDEEM_VPAY;
       const accounts = await window.ethereum.request({
         method: "eth_accounts"
       });
