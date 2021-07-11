@@ -2,7 +2,7 @@
   <no-ssr>
     <div class="setInfo">
       <div class="avatar-wrapper">
-        <img class="user-avatar" v-if="userInfo.avatarid" :src="userInfo.avatar" alt="">
+        <img class="user-avatar" v-if="userInfo.avatarid" :src="userInfo.avatar" alt="" />
         <i v-else class="iconfont icon-personal avatar-uploader-icon"></i>
         <i v-if="AWSUploading" class="uploading">Uploading</i>
         <i v-else class="iconfont icon-photo avatar-uploader-icon" @click="toggleShowCrop"></i>
@@ -16,32 +16,54 @@
             <i class="iconfont icon-female"></i>
           </el-radio-button>
         </el-radio-group>
-        <el-input placeholder="Nickname" v-model="userInfo.nickname">
+        <el-input placeholder="Nickname" v-model="userInfo.nickname"> </el-input>
+        <el-input
+          type="textarea"
+          :autosize="{ minRows: 2, maxRows: 4 }"
+          placeholder="Signature"
+          v-model="userInfo.signature"
+          :maxlength="100"
+          resize="none"
+        >
         </el-input>
-        <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="Signature" v-model="userInfo.signature" :maxlength='100' resize='none'>
-        </el-input>
-        <el-button type="primary" class="save-button" :class="{f:gender ==='f'}" @click="updateAvatar">Save</el-button>
+        <el-button
+          type="primary"
+          class="save-button"
+          :class="{ f: gender === 'f' }"
+          @click="updateAvatar"
+          :loading="isUpdating"
+          >Save</el-button
+        >
       </div>
-      <my-upload url='' langType='en' :width='300' :height='300' :noSquare='false' :noRotate='true' @crop-success='cropPic' v-model="showCrop"></my-upload>
+      <my-upload
+        url=""
+        langType="en"
+        :width="300"
+        :height="300"
+        :noSquare="false"
+        :noRotate="true"
+        @crop-success="cropPic"
+        v-model="showCrop"
+      ></my-upload>
     </div>
   </no-ssr>
 </template>
 <script>
-import myUpload from './vue-image-crop-upload/upload-2.vue';
-import axios from 'axios';
-import apiUrl from '../assets/js/config/urlConfig.js';
-import jsFormat from '../static/tools/jsFormat.js';
-import totp from '../static/tools/totp.js';
-import docCookies from '../static/tools/cookies.js';
-import SparkMD5 from 'spark-md5';
-import AWS from 'aws-sdk';
+import myUpload from "./vue-image-crop-upload/upload-2.vue";
+import axios from "axios";
+import apiUrl from "../assets/js/config/urlConfig.js";
+import jsFormat from "../static/tools/jsFormat.js";
+import totp from "../static/tools/totp.js";
+import docCookies from "../static/tools/cookies.js";
+import SparkMD5 from "spark-md5";
+import AWS from "aws-sdk";
 AWS.config.update({
-  region: 'us-east-1',
+  region: "us-east-1",
   credentials: new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: 'us-east-1:64864bf3-8f6f-4c2b-b38e-56079efbca7e'
+    IdentityPoolId: "us-east-1:64864bf3-8f6f-4c2b-b38e-56079efbca7e"
   })
 });
-const BUCKET = 'vevue-us';
+const BUCKET = "vevue-us";
 export default {
   components: {
     myUpload
@@ -49,22 +71,23 @@ export default {
   data() {
     const result = {
       cookiesEnd: 604800, // cookies时间
-      gender: '',
-      towho: '',
+      gender: "",
+      towho: "",
       showCrop: false,
       AWSUploading: false,
-      imageId: '',
-      imageIdCache: '',
+      isUpdating: false,
+      imageId: "",
+      imageIdCache: "",
       maxRequestTimes: 5,
-      defaultSignature: 'Hi Vevue!',
+      defaultSignature: "Hi Vevue!",
       userInfo: {
-        nickname: '',
-        signature: ''
+        nickname: "",
+        signature: ""
       }
     };
     if (process.client) {
-      result.gender = docCookies.getItem('gender') === 'f' ? 'f' : 'm';
-      result.towho = docCookies.getItem('userid');
+      result.gender = docCookies.getItem("gender") === "f" ? "f" : "m";
+      result.towho = docCookies.getItem("userid");
     }
     return result;
   },
@@ -85,12 +108,12 @@ export default {
         return;
       }
       axios
-        .post(apiUrl.vevueAPI + 'visitor', {
-          userid: docCookies.getItem('userid') || '-',
+        .post(apiUrl.vevueAPI + "visitor", {
+          userid: docCookies.getItem("userid") || "-",
           towho: that.towho,
           date: new Date().getTime(),
-          authcode: totp.getCode(docCookies.getItem('safekey')),
-          cid: docCookies.getItem('cid'),
+          authcode: totp.getCode(docCookies.getItem("safekey")),
+          cid: docCookies.getItem("cid"),
           timestamp: Math.floor(new Date().getTime() / 1000)
         })
         .then(res => {
@@ -99,8 +122,8 @@ export default {
             result.nickname = result.nickname;
             result.signature = result.signature;
             result.avatarid = result.avatar;
-            result.avatar = apiUrl.avatarURL + result.avatar + '.jpg';
-            result.cover = apiUrl.avatarURL + result.cover + '.jpg';
+            result.avatar = apiUrl.avatarURL + result.avatar + ".jpg";
+            result.cover = apiUrl.avatarURL + result.cover + ".jpg";
             that.userInfo = result;
             that.gender = result.gender;
           } else if (res.data.errcode === 110) {
@@ -112,12 +135,8 @@ export default {
     },
     cropPic(imageDataUrl, field) {
       let that = this;
-      that.imageIdCache = SparkMD5.hash(
-        docCookies.getItem('userid') + new Date().getTime()
-      );
-      this.userInfo.avatarid = this.userInfo.avatarid
-        ? this.userInfo.avatarid
-        : that.imageIdCache;
+      that.imageIdCache = SparkMD5.hash(docCookies.getItem("userid") + new Date().getTime());
+      this.userInfo.avatarid = this.userInfo.avatarid ? this.userInfo.avatarid : that.imageIdCache;
       this.userInfo.avatarCache = this.userInfo.avatar; // 缓存图片路径
       this.userInfo.avatar = imageDataUrl;
       this.toUploadAvatar();
@@ -127,10 +146,10 @@ export default {
       that.AWSUploading = true;
       let params = {
         Bucket: BUCKET,
-        Key: 'avatar/' + this.imageIdCache + '.jpg',
+        Key: "avatar/" + this.imageIdCache + ".jpg",
         Body: jsFormat.dataURLtoBlob(this.userInfo.avatar),
-        ContentType: 'image/jpeg',
-        ACL: 'public-read'
+        ContentType: "image/jpeg",
+        ACL: "public-read"
       };
       let upload = new AWS.S3.ManagedUpload({ params: params });
       upload.send((err, data) => {
@@ -147,89 +166,75 @@ export default {
     updateAvatar() {
       let that = this;
       if (!that.userInfo.nickname.trim()) {
-        that.$message.error('Please enter your nickname.');
+        that.$message.error("Please enter your nickname.");
         return;
       }
       if (!that.userInfo.signature.trim()) {
-        that.$message.error('Please enter the signature.');
+        that.$message.error("Please enter the signature.");
         return;
       }
+      this.isUpdating = true;
       axios
-        .post(apiUrl.vevueAPI + 'avatarwork', {
-          userid: docCookies.getItem('userid'),
+        .post(apiUrl.vevueAPI + "avatarwork", {
+          userid: docCookies.getItem("userid"),
           avatar: that.imageId || that.userInfo.avatarid,
-          cid: docCookies.getItem('cid'),
-          authcode: totp.getCode(docCookies.getItem('safekey')),
+          cid: docCookies.getItem("cid"),
+          authcode: totp.getCode(docCookies.getItem("safekey")),
           timestamp: Math.floor(new Date().getTime() / 1000)
         })
         .then(res => {
           if (res.data.errcode === 0) {
-            docCookies.setItem(
-              'avatar',
-              that.imageId || that.userInfo.avatarid,
-              that.cookiesEnd,
-              '/',
-              null
-            );
+            docCookies.setItem("avatar", that.imageId || that.userInfo.avatarid, that.cookiesEnd, "/", null);
             that.updateCharactor();
           } else {
-            that.$message.error('Upload failed, please try again.');
+            that.$message.error("Upload failed, please try again.");
           }
+        })
+        .catch(error => {
+          this.isUpdating = false;
+          this.$message.error(error.toString());
         });
     },
     updateCharactor() {
       const that = this;
       const nicknameReg = /^[\u4E00-\u9FA5A-Za-z0-9_]+$/;
       if (!nicknameReg.test(that.userInfo.nickname)) {
-        this.$message.error(
-          'Nickname only accept letter, number and underscores'
-        );
+        this.$message.error("Nickname only accept letter, number and underscores");
+        this.isUpdating = false;
         return;
       }
       axios
-        .post(apiUrl.vevueAPI + 'charactor', {
-          userid: docCookies.getItem('userid'),
+        .post(apiUrl.vevueAPI + "charactor", {
+          userid: docCookies.getItem("userid"),
           nickname: that.userInfo.nickname,
-          clientid: '',
+          clientid: "",
           gender: that.gender,
           signature: that.userInfo.signature,
-          cid: docCookies.getItem('cid'),
-          authcode: totp.getCode(docCookies.getItem('safekey')),
+          cid: docCookies.getItem("cid"),
+          authcode: totp.getCode(docCookies.getItem("safekey")),
           timestamp: Math.floor(new Date().getTime() / 1000),
-          language: ''
+          language: ""
         })
         .then(res => {
           if (res.data.errcode === 0) {
-            docCookies.setItem(
-              'nickname',
-              that.userInfo.nickname,
-              that.cookiesEnd,
-              '/',
-              null
-            );
-            docCookies.setItem(
-              'gender',
-              that.gender,
-              that.cookiesEnd,
-              '/',
-              null
-            );
+            docCookies.setItem("nickname", that.userInfo.nickname, that.cookiesEnd, "/", null);
+            docCookies.setItem("gender", that.gender, that.cookiesEnd, "/", null);
             this.$message({
-              message: 'Saved successfully',
-              type: 'success',
+              message: "Saved successfully",
+              type: "success",
               duration: 5000
             });
             // location.href = '/';
           } else if (res.data.errcode === 294) {
-            that.$message.error('The nickname is exist, please change.');
+            that.$message.error("The nickname is exist, please change.");
           } else {
-            that.$message.error('Upload failed, please try again.');
+            that.$message.error("Upload failed, please try again.");
           }
+          this.isUpdating = false;
         })
         .catch(res => {
-          this.$message.error(
-            'The server encountered an error. Please try again later.'
-          );
+          this.isUpdating = false;
+          this.$message.error("The server encountered an error. Please try again later.");
         });
     },
     toggleShowCrop() {
